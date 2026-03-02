@@ -1,0 +1,162 @@
+{
+  "id": "roadmap-2024",
+  "title": "PubWatch 2024 Roadmap",
+  "vision_id": "pubwatch-vision",
+  "epics": [
+    {
+      "id": "epic-1",
+      "title": "Profile Management",
+      "outcome": "Researchers can define, edit, and maintain multiple topic profiles without writing code.",
+      "success_metrics": [
+        {
+          "name": "Profile creation time",
+          "target": "Researchers can create a new profile in less than 2 minutes",
+          "unit": "minutes"
+        },
+        {
+          "name": "Profile editing time",
+          "target": "Researchers can edit an existing profile in less than 1 minute",
+          "unit": "minutes"
+        }
+      ],
+      "architectural_impact": [
+        {
+          "component": "Frontend",
+          "change_type": "Feature Addition",
+          "description": "Add profile creation and editing UI components"
+        },
+        {
+          "component": "Backend",
+          "change_type": "API Enhancement",
+          "description": "Implement profile management endpoints"
+        },
+        {
+          "component": "Database",
+          "change_type": "Schema Update",
+          "description": "Add profile-related tables and relationships"
+        }
+      ],
+      "features": []
+    },
+    {
+      "id": "epic-2",
+      "title": "PubMed Data Fetching and Processing",
+      "outcome": "System reliably fetches PubMed data and processes it for relevance scoring.",
+      "success_metrics": [
+        {
+          "name": "Data fetching reliability",
+          "target": "99% success rate for PubMed data fetching per week",
+          "unit": "percentage"
+        },
+        {
+          "name": "Processing latency",
+          "target": "Maximum 30 seconds to process 100 papers",
+          "unit": "seconds"
+        }
+      ],
+      "architectural_impact": [
+        {
+          "component": "Backend",
+          "change_type": "New Component",
+          "description": "Implement PubMed data fetcher with rate limit handling"
+        },
+        {
+          "component": "Cache System",
+          "change_type": "New Component",
+          "description": "Add local caching for fetched results"
+        },
+        {
+          "component": "Processing Engine",
+          "change_type": "Feature Addition",
+          "description": "Add paper processing pipeline with caching"
+        }
+      ],
+      "features": []
+    },
+    {
+      "id": "epic-3",
+      "title": "Relevance Scoring",
+      "outcome": "System scores papers for relevance to each profile using keyword-based and user feedback mechanisms.",
+      "success_metrics": [
+        {
+          "name": "Scoring accuracy",
+          "target": "At least 80% of top 10 papers are relevant to the user's profile",
+          "unit": "percentage"
+        },
+        {
+          "name": "User feedback incorporation",
+          "target": "At least 90% of user feedback is incorporated within 24 hours of submission",
+          "unit": "percentage"
+        }
+      ],
+      "architectural_impact": [
+        {
+          "component": "Processing Engine",
+          "change_type": "Feature Enhancement",
+          "description": "Enhance relevance scoring algorithm to support keyword weights and feedback"
+        },
+        {
+          "component": "Feedback System",
+          "change_type": "New Component",
+          "description": "Add UI for marking papers as relevant/not relevant"
+        }
+      ],
+      "features": []
+    },
+    {
+      "id": "epic-4",
+      "title": "Digest Generation and Delivery",
+      "outcome": "System generates and delivers a weekly digest with the top 10 most relevant papers per profile.",
+      "success_metrics": [
+        {
+          "name": "Digest frequency",
+          "target": "Digests are generated and sent weekly on time",
+          "unit": "percentage"
+        },
+        {
+          "name": "Digest delivery time",
+          "target": "Digests arrive within 6 hours of scheduled time",
+          "unit": "hours"
+        }
+      ],
+      "architectural_impact": [
+        {
+          "component": "Processing Engine",
+          "change_type": "Feature Enhancement",
+          "description": "Add digest generation pipeline"
+        },
+        {
+          "component": "Notification System",
+          "change_type": "New Component",
+          "description": "Implement email delivery system for digests"
+        }
+      ],
+      "features": []
+    },
+    {
+      "id": "epic-5",
+      "title": "Adoption and Feedback Collection",
+      "outcome": "Researchers adopt the tool and provide feedback for continuous improvement.",
+      "success_metrics": [
+        {
+          "name": "User adoption rate",
+          "target": "Tool is used weekly by at least 3 researchers in the lab within 1 month of release",
+          "unit": "active users"
+        },
+        {
+          "name": "User feedback rate",
+          "target": "At least 70% of active users provide feedback within 2 weeks of adoption",
+          "unit": "percentage"
+        }
+      ],
+      "architectural_impact": [
+        {
+          "component": "User Feedback",
+          "change_type": "New Component",
+          "description": "Add feedback collection system with analytics dashboard"
+        }
+      ],
+      "features": []
+    }
+  ]
+}

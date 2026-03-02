@@ -1,0 +1,48 @@
+epics:
+- architectural_impact:
+  - change_type: new
+    component: User Profile Service
+    description: A service for managing researcher-defined topic profiles with persistence
+      and validation
+  features: []
+  id: epic-001
+  outcome: Enable researchers to define and maintain named topic profiles without
+    writing code
+  success_metrics:
+  - name: Number of active topic profiles
+    target: '50'
+    unit: profiles
+  title: Topic Profile Management
+- architectural_impact:
+  - change_type: new
+    component: Publication Scoring Engine
+    description: An engine to score incoming publications for relevance to each topic
+      profile
+  - change_type: new
+    component: Digest Generation Service
+    description: A service to generate and deliver weekly ranked paper digests
+  features: []
+  id: epic-002
+  outcome: Produce a weekly digest that surfaces the top 10 most relevant papers per
+    profile
+  success_metrics:
+  - name: Average time saved per researcher
+    target: '80'
+    unit: percentage
+  title: Publication Scoring and Digest Generation
+- architectural_impact:
+  - change_type: new
+    component: Email Notification Service
+    description: A service to generate and send weekly email digests with top papers
+  features: []
+  id: epic-003
+  outcome: Reduce researcher time spent on manual PubMed triage by 80% within 3 months
+    of adoption
+  success_metrics:
+  - name: Reduction in manual triage time
+    target: '80'
+    unit: percentage
+  title: Email Alert System
+id: road-map-001
+title: PubWatch - Researcher Publication Alert System
+vision_id: pubwatch-vision

@@ -1,25 +1,59 @@
-You are a strategic planning assistant. Generate a roadmap based on the following vision and constraints.
+Output ONLY a YAML document. Do not explain. Do not use tools. Do not save files. Print the raw YAML text directly.
 
-## Vision
-{{ vision_yaml }}
+Generate a product roadmap for the following vision:
 
-## Constraints
-{{ constraints }}
+vision_id: {{ vision_id }}
+problem: {{ problem_statement }}
+objectives:
+{% for obj in objectives %}  - {{ obj }}
+{% endfor %}
+time_horizon: {{ time_horizon }}
+{% if constraints %}constraints: {{ constraints }}{% endif %}
 
-## Time Horizon
-{{ time_horizon }}
+Required YAML structure — output this exactly, filling in the values:
 
-## Output Format
-Generate a roadmap with the following structure:
-- id: string (e.g., "roadmap-2024")
-- title: string
-- vision_id: string (must match the vision id)
-- epics: list of epics, each with:
-  - id: string (e.g., "epic-1")
-  - title: string
-  - outcome: string (desired outcome)
-  - success_metrics: list of {name, target, unit}
-  - architectural_impact: list of {component, change_type, description}
-  - features: list of {feature_id} (can be empty for now)
+id: roadmap-001
+title: <descriptive title>
+vision_id: {{ vision_id }}
+epics:
+  - id: epic-001
+    title: <epic title>
+    outcome: <one sentence measurable outcome>
+    success_metrics:
+      - name: <metric>
+        target: <specific number or threshold>
+        unit: <unit>
+    architectural_impact:
+      - component: <component>
+        change_type: new
+        description: <what is built>
+    features: []
+  - id: epic-002
+    title: <epic title>
+    outcome: <one sentence measurable outcome>
+    success_metrics:
+      - name: <metric>
+        target: <specific number or threshold>
+        unit: <unit>
+    architectural_impact:
+      - component: <component>
+        change_type: new
+        description: <what is built>
+    features: []
+  - id: epic-003
+    title: <epic title>
+    outcome: <one sentence measurable outcome>
+    success_metrics:
+      - name: <metric>
+        target: <specific number or threshold>
+        unit: <unit>
+    architectural_impact:
+      - component: <component>
+        change_type: new
+        description: <what is built>
+    features: []
 
-Respond with ONLY valid YAML. No explanation, no markdown fences, no extra text.
+Rules:
+- Output raw YAML only. No markdown. No explanation. No preamble.
+- Include exactly 3 epics unless the vision clearly requires more (max 8).
+- vision_id must be exactly: {{ vision_id }}

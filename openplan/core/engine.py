@@ -91,11 +91,15 @@ class PlanningEngine:
         ) as client:
             self._client = client
             try:
-                vision_yaml = yaml.dump(vision.model_dump(by_alias=True))
                 context = {
-                    "vision_yaml": vision_yaml,
+                    # Flattened fields for cleaner templates
+                    "vision_id": vision.id,
+                    "problem_statement": vision.problem_statement,
+                    "objectives": vision.objectives,
                     "constraints": constraints,
                     "time_horizon": time_horizon,
+                    # Full YAML dump for templates that want the whole thing
+                    "vision_yaml": yaml.dump(vision.model_dump(by_alias=True)),
                 }
                 roadmap_yaml = self._generate_with_refinement(
                     template_name="roadmap.j2",

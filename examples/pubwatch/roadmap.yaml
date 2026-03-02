@@ -1,0 +1,67 @@
+id: roadmap-001
+title: PubMed Literature Monitoring Platform
+vision_id: pubwatch-vision
+epics:
+  - id: epic-001
+    title: Automated Literature Collection
+    outcome: Researchers can automatically collect publications from PubMed based on defined topic profiles without manual search effort.
+    success_metrics:
+      - name: Triage time reduction
+        target: "Researchers spend less than 5 minutes per week reviewing the digest vs 30+ minutes on raw PubMed alerts"
+        unit: minutes per week
+    architectural_impact:
+      - component: PubMed API Integration
+        change_type: new
+        description: Implement a scalable PubMed E-utilities wrapper with caching and exponential backoff to handle rate limiting
+      - component: Profile Management
+        change_type: modify
+        description: Extend profile system to include PubMed search parameters and collection schedules
+    features: []
+  - id: epic-002
+    title: Topic Profiling and Relevance Scoring
+    outcome: Users can define and maintain named topic profiles with keyword-based relevance scoring for publication filtering.
+    success_metrics:
+      - name: Relevance precision
+        target: "At least 80% of papers in the digest are rated relevant by the researcher in a 2-week pilot"
+        unit: percent
+    architectural_impact:
+      - component: Relevance Engine
+        change_type: new
+        description: Build a configurable keyword scoring system with tunable weights and false positive marking
+      - component: Profile Management
+        change_type: new
+        description: Create a profile creation and editing interface for managing topics and keywords
+    features: []
+  - id: epic-003
+    title: Weekly Digest Generation
+    outcome: Researchers receive a concise weekly digest of the top 10 most relevant papers per profile ranked by relevance score.
+    success_metrics:
+      - name: Weekly adoption
+        target: "Tool is used weekly by at least 3 researchers in the lab within 1 month of release"
+        unit: active users
+    architectural_impact:
+      - component: Digest Engine
+        change_type: new
+        description: Implement weekly digest generation and ranking system
+      - component: Notification System
+        change_type: new
+        description: Create email or dashboard notification delivery for weekly digests
+      - component: Profile Management
+        change_type: modify
+        description: Add digest scheduling and delivery configuration to profiles
+    features: []
+  - id: epic-004
+    title: Profile Management System
+    outcome: Researchers can define and maintain named topic profiles without writing code through an intuitive interface.
+    success_metrics:
+      - name: Weekly adoption
+        target: "Tool is used weekly by at least 3 researchers in the lab within 1 month of release"
+        unit: active users
+    architectural_impact:
+      - component: User Interface
+        change_type: new
+        description: Develop a web-based UI for creating, editing, and organizing topic profiles
+      - component: Profile Storage
+        change_type: new
+        description: Implement persistent storage for user profiles with version control
+    features: []
