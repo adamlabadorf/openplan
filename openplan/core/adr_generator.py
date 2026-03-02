@@ -35,10 +35,11 @@ class ADRGenerator:
             "alternatives": alternatives,
         }
 
-        adr_yaml = self._generate_with_validation(
-            template_name="adr.j2",
-            context=context,
-        )
+        with self.engine.client_context():
+            adr_yaml = self._generate_with_validation(
+                template_name="adr.j2",
+                context=context,
+            )
 
         if isinstance(adr_yaml, dict):
             adr = ADR(**adr_yaml)

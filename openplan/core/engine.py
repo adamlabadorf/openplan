@@ -1,6 +1,7 @@
 import json
 
 import yaml
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional, Type, TypeVar
 
@@ -41,6 +42,30 @@ class PlanningEngine:
         self.project_dir = Path(project_dir)
         self.model = model
         self.template_loader = TemplateLoader()
+        # Active OpenCodeClient — set only during a top-level planning call.
+        # One subprocess is shared across all _generate() calls in that run.
+        self._client: Optional[OpenCodeClient] = None
+
+    @contextmanager
+    def client_context(self):
+        """Open one ACP subprocess for a planning run.
+
+        Used by FeatureStabilizer, CampaignGenerator, and ADRGenerator so they
+        share the same single-subprocess pattern as generate_roadmap /
+        decompose_epic.  Every engine._generate() call within the block reuses
+        the same subprocess; each call still gets its own fresh session::
+
+            with engine.client_context():
+                data = engine._generate_with_refinement(...)
+        """
+        with OpenCodeClient(
+            project_dir=str(self.project_dir), model=self.model
+        ) as client:
+            self._client = client
+            try:
+                yield client
+            finally:
+                self._client = None
 
     def generate_roadmap(
         self,
@@ -61,29 +86,32 @@ class PlanningEngine:
         Raises:
             PlanningError: If validation fails after max refinements
         """
-        vision_yaml = yaml.dump(vision.model_dump(by_alias=True))
-
-        context = {
-            "vision_yaml": vision_yaml,
-            "constraints": constraints,
-            "time_horizon": time_horizon,
-        }
-
-        roadmap_yaml = self._generate_with_refinement(
-            template_name="roadmap.j2",
-            context=context,
-            schema_class=Roadmap,
-            artifact_type="roadmap",
-        )
-
-        if isinstance(roadmap_yaml, dict):
-            roadmap_yaml["vision_id"] = vision.id
-            roadmap = Roadmap(**roadmap_yaml)
-        else:
-            raise PlanningError("Generated roadmap is not a valid dictionary")
-
-        self._persist_roadmap(roadmap)
-        return roadmap
+        with OpenCodeClient(
+            project_dir=str(self.project_dir), model=self.model
+        ) as client:
+            self._client = client
+            try:
+                vision_yaml = yaml.dump(vision.model_dump(by_alias=True))
+                context = {
+                    "vision_yaml": vision_yaml,
+                    "constraints": constraints,
+                    "time_horizon": time_horizon,
+                }
+                roadmap_yaml = self._generate_with_refinement(
+                    template_name="roadmap.j2",
+                    context=context,
+                    schema_class=Roadmap,
+                    artifact_type="roadmap",
+                )
+                if isinstance(roadmap_yaml, dict):
+                    roadmap_yaml["vision_id"] = vision.id
+                    roadmap = Roadmap(**roadmap_yaml)
+                else:
+                    raise PlanningError("Generated roadmap is not a valid dictionary")
+                self._persist_roadmap(roadmap)
+                return roadmap
+            finally:
+                self._client = None
 
     def decompose_epic(
         self,
@@ -102,32 +130,34 @@ class PlanningEngine:
         Raises:
             PlanningError: If validation fails after max refinements
         """
-        epic_yaml = yaml.dump(epic.model_dump(by_alias=True))
-
-        context = {
-            "epic_yaml": epic_yaml,
-            "arch_summary": arch_summary,
-        }
-
-        features_yaml = self._generate_with_refinement(
-            template_name="epic.j2",
-            context=context,
-            schema_class=None,
-            artifact_type="feature",
-        )
-
-        if not isinstance(features_yaml, list):
-            features_yaml = [features_yaml]
-
-        features = []
-        for feature_data in features_yaml:
-            if not isinstance(feature_data, dict):
-                continue
-            feature = Feature(**feature_data)
-            features.append(feature)
-            self._persist_feature(feature)
-
-        return features
+        with OpenCodeClient(
+            project_dir=str(self.project_dir), model=self.model
+        ) as client:
+            self._client = client
+            try:
+                epic_yaml = yaml.dump(epic.model_dump(by_alias=True))
+                context = {
+                    "epic_yaml": epic_yaml,
+                    "arch_summary": arch_summary,
+                }
+                features_yaml = self._generate_with_refinement(
+                    template_name="epic.j2",
+                    context=context,
+                    schema_class=None,
+                    artifact_type="feature",
+                )
+                if not isinstance(features_yaml, list):
+                    features_yaml = [features_yaml]
+                features = []
+                for feature_data in features_yaml:
+                    if not isinstance(feature_data, dict):
+                        continue
+                    feature = Feature(**feature_data)
+                    features.append(feature)
+                    self._persist_feature(feature)
+                return features
+            finally:
+                self._client = None
 
     def _generate_with_refinement(
         self,
@@ -238,7 +268,10 @@ class PlanningEngine:
             return {"issues": [], "requires_refinement": False}
 
     def _generate(self, prompt: str) -> str:
-        """Generate content using OpenCodeClient.
+        """Generate content using the active OpenCodeClient.
+
+        Must only be called from within a top-level planning method
+        (generate_roadmap, decompose_epic) that owns the client context.
 
         Args:
             prompt: The prompt to send
@@ -248,12 +281,14 @@ class PlanningEngine:
 
         Raises:
             GenerationError: If generation fails
+            PlanningError: If called outside an active client context
         """
-        with OpenCodeClient(
-            project_dir=str(self.project_dir),
-            model=self.model,
-        ) as client:
-            return client.generate(prompt)
+        if self._client is None:
+            raise PlanningError(
+                "No active OpenCodeClient — _generate() must be called "
+                "from within generate_roadmap() or decompose_epic()"
+            )
+        return self._client.generate(prompt)
 
     def _persist_roadmap(self, roadmap: Roadmap) -> None:
         """Persist roadmap to plan directory."""

@@ -35,10 +35,11 @@ class CampaignGenerator:
             "technical_debt": technical_debt,
         }
 
-        campaign_yaml = self._generate_with_validation(
-            template_name="campaign.j2",
-            context=context,
-        )
+        with self.engine.client_context():
+            campaign_yaml = self._generate_with_validation(
+                template_name="campaign.j2",
+                context=context,
+            )
 
         if isinstance(campaign_yaml, dict):
             campaign = Campaign(**campaign_yaml)

@@ -30,12 +30,13 @@ class FeatureStabilizer:
         }
 
         try:
-            stabilized_data = self.engine._generate_with_refinement(
-                template_name="stabilize_feature.j2",
-                context=context,
-                schema_class=None,
-                artifact_type="feature",
-            )
+            with self.engine.client_context():
+                stabilized_data = self.engine._generate_with_refinement(
+                    template_name="stabilize_feature.j2",
+                    context=context,
+                    schema_class=None,
+                    artifact_type="feature",
+                )
 
             if isinstance(stabilized_data, dict):
                 stabilized_data["spec_ready"] = True
