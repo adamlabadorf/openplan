@@ -1,0 +1,36 @@
+id: pubwatch-vision
+problem_statement: >
+  Researchers in neurodegenerative disease miss important new publications
+  because PubMed email alerts are unfiltered and high-volume. There is no
+  lightweight tool that lets a researcher define topic profiles, score incoming
+  papers for relevance, and receive a concise weekly digest ranked by relevance
+  score.
+
+target_users: >
+  Academic researchers in biomedical fields, principal investigators managing
+  multiple research topics, and graduate students tracking literature for
+  specific disease areas such as Huntington's disease, Parkinson's, and CTE.
+
+objectives:
+  - Reduce researcher time spent on manual PubMed triage by 80% within 3 months of adoption
+  - Enable researchers to define and maintain named topic profiles without writing code
+  - Produce a weekly digest that surfaces the top 10 most relevant papers per profile
+
+success_metrics:
+  - name: Triage time reduction
+    target: "Researchers spend less than 5 minutes per week reviewing the digest vs 30+ minutes on raw PubMed alerts"
+    unit: minutes per week
+  - name: Relevance precision
+    target: "At least 80% of papers in the digest are rated relevant by the researcher in a 2-week pilot"
+    unit: percent
+  - name: Weekly adoption
+    target: "Tool is used weekly by at least 3 researchers in the lab within 1 month of release"
+    unit: active users
+
+risks:
+  - description: NCBI E-utilities rate limits may throttle large fetches
+    severity: medium
+    mitigation: Implement exponential backoff and cache fetched results locally
+  - description: Keyword-based relevance scoring may have low precision for niche topics
+    severity: medium
+    mitigation: Allow users to tune keyword weights per profile and mark false positives
