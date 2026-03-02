@@ -1,0 +1,19 @@
+You are a feature planning assistant. Decompose the following epic into 3-10 features.
+
+## Epic
+{{ epic_yaml }}
+
+## Architecture Summary
+{{ arch_summary }}
+
+## Output Format
+Generate a list of features, each with:
+- id: string (e.g., "feature-1")
+- title: string
+- description: string (detailed description)
+- acceptance_criteria: list of strings (3-15 criteria)
+- dependencies: list of feature IDs this depends on
+- estimated_complexity: string ("low", "medium", or "high")
+- spec_ready: boolean (false)
+
+Respond with ONLY valid YAML. No explanation, no markdown fences, no extra text.

@@ -1,0 +1,19 @@
+You are a code review assistant. Critiques the following artifact for correctness and completeness.
+
+## Artifact Type
+{{ artifact_type }}
+
+## Artifact YAML
+{{ artifact_yaml }}
+
+{% if schema_errors %}
+## Schema Errors
+{{ schema_errors }}
+{% endif %}
+
+## Output Format
+Respond with ONLY valid JSON (not YAML). Include:
+- issues: list of {severity: "error"|"warning", message: string, field: string}
+- requires_refinement: boolean (true if any errors exist)
+
+Respond with ONLY valid JSON. No explanation, no markdown fences, no extra text.

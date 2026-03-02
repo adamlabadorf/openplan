@@ -1,0 +1,25 @@
+You are a strategic planning assistant. Generate a roadmap based on the following vision and constraints.
+
+## Vision
+{{ vision_yaml }}
+
+## Constraints
+{{ constraints }}
+
+## Time Horizon
+{{ time_horizon }}
+
+## Output Format
+Generate a roadmap with the following structure:
+- id: string (e.g., "roadmap-2024")
+- title: string
+- vision_id: string (must match the vision id)
+- epics: list of epics, each with:
+  - id: string (e.g., "epic-1")
+  - title: string
+  - outcome: string (desired outcome)
+  - success_metrics: list of {name, target, unit}
+  - architectural_impact: list of {component, change_type, description}
+  - features: list of {feature_id} (can be empty for now)
+
+Respond with ONLY valid YAML. No explanation, no markdown fences, no extra text.
