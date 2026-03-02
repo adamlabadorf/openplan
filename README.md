@@ -51,8 +51,10 @@ openplan generate-roadmap              # Generate roadmap from vision.yaml
 openplan decompose-epic EPIC_ID        # Decompose an epic into features
 openplan stabilize-feature FEATURE_ID  # Expand and validate a feature
 openplan generate-campaign SUBSYSTEM   # Generate a refactoring campaign
+openplan generate-adr                  # Generate an Architecture Decision Record
 openplan validate                      # Validate all artifacts
 openplan export-to-openspec FEATURE_ID # Export a spec-ready feature to OpenSpec
+openplan status                        # Show project status and counts
 ```
 
 ---
@@ -124,6 +126,78 @@ def feature_to_openspec_input(feature):
 ```
 
 OpenPlan blocks export if a feature fails validation.
+
+---
+
+## Sample vision.yaml
+
+```yaml
+id: api-performance-vision
+problem_statement: Reduce API response time from 500ms to under 100ms for user dashboard
+target_users: Internal engineering team
+objectives:
+  - Reduce latency
+  - Improve user experience
+success_metrics:
+  - name: response_time
+    target: '100'
+    unit: milliseconds
+  - name: p99_latency
+    target: '150'
+    unit: milliseconds
+```
+
+### Validation
+
+Vision YAML is validated against the Vision Pydantic schema on load. Validation includes:
+- At least one success metric required
+- Vague phrases are rejected (improve, enhance, optimize, etc. without specific metric)
+
+```bash
+openplan validate --all  # Validate all artifacts including vision.yaml
+```
+
+---
+
+## Quickstart
+
+```bash
+# Initialize a new project
+mkdir my-plan && cd my-plan
+openplan init
+
+# Create vision.yaml (see sample above)
+cat > openplan/visions/vision.yaml << 'EOF'
+id: api-performance-vision
+problem_statement: Reduce API response time from 500ms to under 100ms for user dashboard
+target_users: Internal engineering team
+objectives:
+  - Reduce latency
+  - Improve user experience
+success_metrics:
+  - name: response_time
+    target: '100'
+    unit: milliseconds
+  - name: p99_latency
+    target: '150'
+    unit: milliseconds
+EOF
+
+# Generate a roadmap from vision
+openplan generate-roadmap
+
+# Decompose an epic into features
+openplan decompose-epic epic-1
+
+# Stabilize a feature (expand acceptance criteria)
+openplan stabilize-feature feature-1
+
+# Export to OpenSpec (requires spec_ready: true)
+openplan export-to-openspec feature-1 --openspec-dir ../openspec
+
+# Check project status
+openplan status
+```
 
 ---
 

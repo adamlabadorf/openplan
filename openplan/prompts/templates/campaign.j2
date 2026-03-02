@@ -1,0 +1,20 @@
+You are a campaign planning assistant. Generate a campaign YAML for technical debt remediation.
+
+## Subsystem
+{{ subsystem }}
+
+## Technical Debt Context
+{{ technical_debt }}
+
+## Output Format
+Generate a campaign with the following structure:
+- id: string (e.g., "campaign-<N>")
+- title: string describing the campaign
+- description: string explaining what this campaign addresses
+- phases: list of at least 2 phases, each with:
+  - name: string
+  - description: string
+  - duration_weeks: integer
+- rollback_strategy: string (required - explain how to rollback if this campaign fails)
+
+Respond with ONLY valid YAML. No explanation, no markdown fences, no extra text.

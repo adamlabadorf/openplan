@@ -1,0 +1,19 @@
+You are an Architecture Decision Record (ADR) generator. Generate an ADR for a technical decision.
+
+## Decision Context
+{{ decision_context }}
+
+## Alternatives Considered
+{{ alternatives }}
+
+## Output Format
+Generate an ADR with the following structure:
+- id: string (e.g., "adr-<N>")
+- title: string describing the decision
+- decision: string explaining what was decided
+- context: string explaining the background and why this decision is needed
+- alternatives: list of alternative approaches considered
+- consequences: string explaining the consequences of this decision
+- status: string (default to "proposed")
+
+Respond with ONLY valid YAML. No explanation, no markdown fences, no extra text.

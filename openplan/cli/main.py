@@ -8,7 +8,11 @@ from rich.console import Console
 from rich.table import Table
 
 from openplan.core.engine import PlanningEngine, PlanningError
-from openplan.core.schemas import Epic, Vision
+from openplan.core.schemas import Epic, Feature, Vision
+from openplan.core.stabilizer import FeatureStabilizer
+from openplan.core.campaign_generator import CampaignGenerator
+from openplan.core.adr_generator import ADRGenerator
+from openplan.integrations.openspec import ExportError, export_feature
 from openplan.storage import LockedArtifactError, PlanRepository
 
 app = typer.Typer(help="OpenPlan CLI")
@@ -194,6 +198,241 @@ def decompose_epic(
             for err in e.validation_errors:
                 console.print(f"  [red]- {err}[/red]")
         raise typer.Exit(code=1)
+
+
+@app.command()
+def stabilize_feature(
+    feature_id: str = typer.Argument(..., help="Feature ID to stabilize"),
+    model: Optional[str] = typer.Option(
+        None, "--model", help="Model to use for generation"
+    ),
+    project_dir: str = typer.Argument(".", help="Project directory"),
+) -> None:
+    """Stabilize a feature by expanding vague acceptance criteria."""
+    project_path = Path(project_dir)
+    openplan_dir = project_path / "openplan"
+
+    feature_path = openplan_dir / "features" / f"{feature_id}.yaml"
+
+    if not feature_path.exists():
+        console.print(f"[red]Error: Feature not found: {feature_path}[/red]")
+        raise typer.Exit(code=1)
+
+    with open(feature_path) as f:
+        feature_data = yaml.safe_load(f)
+
+    feature = Feature(**feature_data)
+
+    try:
+        engine = PlanningEngine(
+            plan_dir=str(openplan_dir),
+            project_dir=str(project_path),
+            model=model,
+        )
+        stabilizer = FeatureStabilizer(engine)
+        stabilized = stabilizer.stabilize(feature)
+        console.print(f"[green]Feature stabilized: {stabilized.id}[/green]")
+        console.print(f"[green]spec_ready: {stabilized.spec_ready}[/green]")
+        console.print(
+            f"[green]Saved to: {openplan_dir / 'features' / f'{stabilized.id}.yaml'}[/green]"
+        )
+    except PlanningError as e:
+        console.print(f"[red]Error: {e.message}[/red]")
+        if e.validation_errors:
+            for err in e.validation_errors:
+                console.print(f"  [red]- {err}[/red]")
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def generate_campaign(
+    subsystem: str = typer.Argument(..., help="Subsystem to generate campaign for"),
+    debt: Optional[str] = typer.Option(
+        None, "--debt", help="Technical debt description"
+    ),
+    model: Optional[str] = typer.Option(
+        None, "--model", help="Model to use for generation"
+    ),
+    project_dir: str = typer.Argument(".", help="Project directory"),
+) -> None:
+    """Generate a campaign for technical debt remediation."""
+    project_path = Path(project_dir)
+    openplan_dir = project_path / "openplan"
+
+    try:
+        engine = PlanningEngine(
+            plan_dir=str(openplan_dir),
+            project_dir=str(project_path),
+            model=model,
+        )
+        generator = CampaignGenerator(engine)
+        campaign = generator.generate(
+            subsystem=subsystem,
+            technical_debt=debt or "",
+        )
+        console.print(f"[green]Campaign generated: {campaign.id}[/green]")
+        console.print(
+            f"[green]Saved to: {openplan_dir / 'campaigns' / f'{campaign.id}.yaml'}[/green]"
+        )
+    except PlanningError as e:
+        console.print(f"[red]Error: {e.message}[/red]")
+        if e.validation_errors:
+            for err in e.validation_errors:
+                console.print(f"  [red]- {err}[/red]")
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def generate_adr(
+    context: Optional[str] = typer.Option(None, "--context", help="Decision context"),
+    alternatives: Optional[str] = typer.Option(
+        None, "--alternatives", help="Alternatives considered"
+    ),
+    model: Optional[str] = typer.Option(
+        None, "--model", help="Model to use for generation"
+    ),
+    project_dir: str = typer.Argument(".", help="Project directory"),
+) -> None:
+    """Generate an Architecture Decision Record (ADR)."""
+    project_path = Path(project_dir)
+    openplan_dir = project_path / "openplan"
+
+    try:
+        engine = PlanningEngine(
+            plan_dir=str(openplan_dir),
+            project_dir=str(project_path),
+            model=model,
+        )
+        generator = ADRGenerator(engine)
+        adr = generator.generate(
+            decision_context=context or "",
+            alternatives=alternatives or "",
+        )
+        console.print(f"[green]ADR generated: {adr.id}[/green]")
+        console.print(
+            f"[green]Saved to: {openplan_dir / 'adrs' / f'{adr.id}.yaml'}[/green]"
+        )
+    except PlanningError as e:
+        console.print(f"[red]Error: {e.message}[/red]")
+        if e.validation_errors:
+            for err in e.validation_errors:
+                console.print(f"  [red]- {err}[/red]")
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def export_to_openspec(
+    feature_id: str = typer.Argument(..., help="Feature ID to export"),
+    openspec_dir: Optional[str] = typer.Option(
+        None, "--openspec-dir", help="OpenSpec directory path"
+    ),
+    arch_context: Optional[str] = typer.Option(
+        "", "--arch-context", help="Architectural context for the feature"
+    ),
+    project_dir: str = typer.Argument(".", help="Project directory"),
+) -> None:
+    """Export a spec-ready feature to OpenSpec."""
+    project_path = Path(project_dir)
+    openplan_dir = project_path / "openplan"
+
+    feature_path = openplan_dir / "features" / f"{feature_id}.yaml"
+
+    if not feature_path.exists():
+        console.print(f"[red]Error: Feature not found: {feature_path}[/red]")
+        raise typer.Exit(code=1)
+
+    with open(feature_path) as f:
+        feature_data = yaml.safe_load(f)
+
+    feature = Feature(**feature_data)
+
+    if openspec_dir is None:
+        openspec_path = project_path / "openspec"
+    else:
+        openspec_path = Path(openspec_dir)
+
+    if not openspec_path.exists():
+        console.print(
+            f"[red]Error: OpenSpec directory not found: {openspec_path}[/red]"
+        )
+        raise typer.Exit(code=1)
+
+    try:
+        export_feature(feature, openspec_path, arch_context or "")
+        console.print(f"[green]Feature '{feature_id}' exported to OpenSpec[/green]")
+        console.print(
+            f"[green]Change created in: {openspec_path / 'changes' / feature_id}[/green]"
+        )
+    except ExportError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def status(
+    project_dir: str = typer.Argument(".", help="Project directory"),
+) -> None:
+    """Show the current status of the OpenPlan project."""
+    project_path = Path(project_dir)
+    openplan_dir = project_path / "openplan"
+
+    if not openplan_dir.exists():
+        console.print(
+            "[red]Error: Not an OpenPlan project. Run 'openplan init' first.[/red]"
+        )
+        raise typer.Exit(code=1)
+
+    repo = PlanRepository(project_dir)
+
+    vision_loaded = False
+    vision_ids = repo.list("vision")
+    if vision_ids:
+        vision = repo.read("vision", vision_ids[0])
+        if vision:
+            vision_loaded = True
+
+    roadmap_ids = repo.list("roadmap")
+    roadmap_count = len(roadmap_ids)
+
+    epic_count = len(repo.list("epic"))
+
+    feature_ids = repo.list("feature")
+    from openplan.core.schemas import Feature as FeatureModel
+
+    feature_count = len(feature_ids)
+    spec_ready_count = 0
+    for fid in feature_ids:
+        f = repo.read("feature", fid)
+        if f:
+            feature = FeatureModel(**f.model_dump())
+            if feature.spec_ready:
+                spec_ready_count += 1
+
+    campaign_count = len(repo.list("campaign"))
+    adr_count = len(repo.list("adr"))
+
+    locked_artifacts = []
+    for artifact_type in ["vision", "epic", "feature", "campaign", "adr", "roadmap"]:
+        for artifact_id in repo.list(artifact_type):
+            if repo.is_locked(artifact_type, artifact_id):
+                locked_artifacts.append(f"{artifact_type}/{artifact_id}")
+
+    console.print("\n[bold]OpenPlan Status[/bold]")
+    console.print(f"Vision loaded:      {'Yes' if vision_loaded else 'No'}")
+    console.print(f"Roadmaps:           {roadmap_count}")
+    console.print(f"Epics:              {epic_count}")
+    console.print(
+        f"Features:           {feature_count} total, {spec_ready_count} spec_ready"
+    )
+    console.print(f"Campaigns:          {campaign_count}")
+    console.print(f"ADRs:               {adr_count}")
+
+    if locked_artifacts:
+        console.print(f"\n[yellow]Locked artifacts:[/yellow]")
+        for artifact in locked_artifacts:
+            console.print(f"  - {artifact}")
+    else:
+        console.print("\n[green]No locked artifacts[/green]")
 
 
 if __name__ == "__main__":
