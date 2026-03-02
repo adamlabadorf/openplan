@@ -19,19 +19,42 @@ app = typer.Typer(help="OpenPlan CLI")
 console = Console()
 
 
+DEFAULT_MODEL = "ollama/qwen3-coder:30b"
+
+
 @app.command()
 def init(
     project_dir: str = typer.Argument(".", help="Project directory to initialize"),
+    model: str = typer.Option(
+        DEFAULT_MODEL,
+        "--model",
+        help="Default OpenCode model for generation (provider/model)",
+    ),
 ) -> None:
     """Initialize a new OpenPlan project structure."""
+    import json
+
     repo = PlanRepository(project_dir)
     repo.init()
+
+    # Write opencode.json so generation calls use the specified model
+    opencode_config = {
+        "$schema": "https://opencode.ai/config.json",
+        "model": model,
+        "default_agent": "build",
+        "permission": "allow",
+    }
+    opencode_path = Path(project_dir) / "opencode.json"
+    with open(opencode_path, "w") as f:
+        json.dump(opencode_config, f, indent=2)
+
     console.print(
         f"[green]Initialized OpenPlan in {Path(project_dir).resolve()}[/green]"
     )
     console.print(
         "[green]Created openplan/ with subdirectories: epics/, features/, campaigns/, adrs/[/green]"
     )
+    console.print(f"[green]Model: {model}[/green]")
 
 
 @app.command()
