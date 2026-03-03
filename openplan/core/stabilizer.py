@@ -69,6 +69,11 @@ class FeatureStabilizer:
             if field not in data:
                 data[field] = getattr(original, field)
 
+        # Coerce dependencies from string to list if model returned a bare string
+        if isinstance(data.get("dependencies"), str):
+            dep = data["dependencies"].strip()
+            data["dependencies"] = [dep] if dep else []
+
         return data
 
     def _persist_feature(self, feature: Feature) -> None:

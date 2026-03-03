@@ -88,7 +88,8 @@ def export_feature(
             f"Failed to export feature '{feature.id}' to OpenSpec: {result.stderr}"
         )
 
-    change_path = openspec_dir / "changes" / feature.id
+    # openspec creates changes under openspec/changes/ relative to cwd
+    change_path = openspec_dir / "openspec" / "changes" / feature.id
     proposal_file = change_path / "proposal.md"
 
     proposal_content = f"""# {feature.title}

@@ -152,7 +152,14 @@ class PlanningEngine:
                 )
                 features_list = self._normalize_features(features_yaml, epic.id)
                 features = []
-                for feature_data in features_list:
+                for i, feature_data in enumerate(features_list, 1):
+                    # Prefix IDs with epic to ensure uniqueness across epics
+                    raw_id = feature_data.get("id", f"feature-{i:03d}")
+                    feature_data["id"] = f"{epic.id}-{raw_id}"
+                    # Coerce dependencies string -> list
+                    deps = feature_data.get("dependencies", [])
+                    if isinstance(deps, str):
+                        feature_data["dependencies"] = [deps] if deps.strip() else []
                     feature = Feature(**feature_data)
                     features.append(feature)
                     self._persist_feature(feature)
