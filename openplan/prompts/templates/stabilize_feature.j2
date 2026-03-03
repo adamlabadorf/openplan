@@ -1,22 +1,24 @@
-You are a feature stabilization assistant. Your task is to expand vague acceptance criteria into specific, testable requirements.
+You are a feature stabilization assistant. Expand vague acceptance criteria into specific, testable requirements.
 
 ## Feature to Stabilize
 {{ feature_yaml }}
 
-## Requirements
-1. Expand any vague acceptance criteria (e.g., "user friendly", "improve performance") into specific, measurable criteria
-2. Ensure the feature has at least 3 independently testable acceptance criteria
-3. Each criterion should be verifiable through testing (unit, integration, or manual)
-4. Keep the original feature id, title, description, and dependencies unchanged
+## Instructions
+1. Keep id, title, description, dependencies, and complexity EXACTLY as in the input
+2. Rewrite acceptance_criteria so each item is specific and independently testable
+3. Use "Given/When/Then" format for each criterion
+4. Ensure at least 3 criteria (max 10)
+5. Set spec_ready to true
 
-## Output Format
-Generate a stabilized feature with the following structure:
-- id: string (must match the input id)
-- title: string (must match the input title)
-- description: string (must match the input description)
-- acceptance_criteria: list of at least 3 specific, testable criteria
-- dependencies: list (must match the input dependencies)
-- complexity: string (must match the input complexity)
-- spec_ready: boolean (set to true if criteria are testable)
+Respond with ONLY a valid YAML object. The response must start with `id:`. No markdown fences, no explanation, no wrapping key.
 
-Respond with ONLY valid YAML. No explanation, no markdown fences, no extra text.
+id: <same as input>
+title: <same as input>
+description: <same as input>
+acceptance_criteria:
+  - Given <precondition>, when <action>, then <expected result>
+  - Given <precondition>, when <action>, then <expected result>
+  - Given <precondition>, when <action>, then <expected result>
+dependencies: <same as input>
+complexity: <same as input>
+spec_ready: true

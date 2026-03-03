@@ -1,0 +1,15 @@
+acceptance_criteria:
+- Given a researcher wants to create a new topic profile, when they use the pubwatch
+  profile create command, then a new profile is saved with the specified keywords
+  and filters
+- Given a researcher has created profiles, when they run pubwatch profile list, then
+  all profiles are displayed with their keywords and last updated timestamp
+- Given a researcher wants to modify a profile, when they use the pubwatch profile
+  update command, then the profile is updated with new keywords and filters
+complexity: low
+dependencies: []
+description: A feature to allow researchers to define and manage their topic profiles
+  for paper filtering
+id: feature-001
+spec_ready: false
+title: Topic Profile Management

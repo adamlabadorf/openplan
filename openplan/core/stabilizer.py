@@ -39,6 +39,7 @@ class FeatureStabilizer:
                 )
 
             if isinstance(stabilized_data, dict):
+                stabilized_data = self._normalize_feature_dict(stabilized_data, feature)
                 stabilized_data["spec_ready"] = True
                 feature = Feature(**stabilized_data)
                 self._persist_feature(feature)
@@ -49,6 +50,26 @@ class FeatureStabilizer:
         except PlanningError:
             feature.spec_ready = False
             raise
+
+    def _normalize_feature_dict(self, data: dict, original: Feature) -> dict:
+        """Unwrap common LLM output shape mistakes and fill in missing fields from original."""
+        # Unwrap {feature: {...}} or {Feature: {...}}
+        for key in ("feature", "Feature"):
+            if key in data and isinstance(data[key], dict):
+                data = data[key]
+                break
+
+        # Normalize Acceptance criteria / Acceptance Criteria -> acceptance_criteria
+        for bad_key in ("Acceptance criteria", "Acceptance Criteria", "acceptance criteria"):
+            if bad_key in data:
+                data["acceptance_criteria"] = data.pop(bad_key)
+
+        # Fill in fields that must match the original if missing
+        for field in ("id", "title", "description", "dependencies", "complexity"):
+            if field not in data:
+                data[field] = getattr(original, field)
+
+        return data
 
     def _persist_feature(self, feature: Feature) -> None:
         """Persist stabilized feature to plan directory."""

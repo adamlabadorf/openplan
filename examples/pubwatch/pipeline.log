@@ -1,185 +1,110 @@
-[22:53:23] 
+[07:06:14] 
 ============================================================
-[22:53:23]   SETUP
-[22:53:23] ============================================================
-[22:53:23] Loaded roadmap: road-map-001 with 3 epics
-[22:53:23] 
+[07:06:14]   SETUP
+[07:06:14] ============================================================
+[07:06:14] Loaded roadmap: road-map-001 with 3 epics
+[07:06:14] 
 ============================================================
-[22:53:23]   PHASE 1: EPIC DECOMPOSITION
-[22:53:23] ============================================================
-[22:53:23] Decomposing epic: epic-001 — Topic Profile Management
-[22:55:16]   ERROR decomposing epic-001: 4 validation errors for Feature
+[07:06:14]   PHASE 1: EPIC DECOMPOSITION
+[07:06:14] ============================================================
+[07:06:14] Decomposing epic: epic-001 — Topic Profile Management
+[07:06:38]   → 6 features generated
+[07:06:38]     - feature-001: Enable researchers to create named topic profiles with defin
+[07:06:38]     - feature-002: Implement validation logic to ensure profile search criteria
+[07:06:38]     - feature-003: Enable automated fetching of papers matching defined topic p
+[07:06:38]     - feature-004: Provide functionality to list and search through stored pape
+[07:06:38]     - feature-005: Allow researchers to update, modify, and delete existing top
+[07:06:38]     - feature-006: Enable researchers to export and import topic profiles for s
+[07:06:38] Decomposing epic: epic-002 — Publication Scoring and Digest Generation
+[07:06:57]   → 6 features generated
+[07:06:57]     - feature-001: A feature to fetch publications from NCBI API and store them
+[07:06:57]     - feature-002: A feature to score incoming publications for relevance to ea
+[07:06:57]     - feature-003: A service to generate and deliver weekly ranked paper digest
+[07:06:57]     - feature-004: A feature to deliver weekly ranked paper digests to research
+[07:06:57]     - feature-005: A feature to allow researchers to create, update, and manage
+[07:06:57]     - feature-006: A feature to monitor system performance and measure success 
+[07:06:57] Decomposing epic: epic-003 — Email Alert System
+[07:07:14]   → 5 features generated
+[07:07:14]     - feature-001: A feature to allow researchers to define and manage their to
+[07:07:14]     - feature-002: A feature to automatically fetch papers from PubMed based on
+[07:07:14]     - feature-003: A feature to generate and format weekly email digests of top
+[07:07:14]     - feature-004: A feature to automatically schedule and send weekly email di
+[07:07:14]     - feature-005: A feature to configure and customize email templates for dif
+[07:07:14] 
+Total features generated: 17
+[07:07:14] 
+============================================================
+[07:07:14]   PHASE 2: FEATURE STABILIZATION
+[07:07:14] ============================================================
+[07:07:14] Stabilizing: feature-001 — Enable researchers to create named topic profiles 
+[07:07:23]   ERROR stabilizing feature-001: 4 validation errors for Feature
 id
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
+  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.12/v/missing
 title
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
+  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.12/v/missing
 description
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
+  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.12/v/missing
 acceptance_criteria
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
+  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.12/v/missing
 Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 77, in <module>
-    features = engine.decompose_epic(epic)
-  File "/home/admin/.openclaw/workspace/openplan/openplan/core/engine.py", line 159, in decompose_epic
-    feature = Feature(**feature_data)
+  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 99, in <module>
+    stable = stabilizer.stabilize(feature)
+  File "/home/admin/.openclaw/workspace/openplan/openplan/core/stabilizer.py", line 43, in stabilize
+    feature = Feature(**stabilized_data)
   File "/home/admin/.openclaw/workspace/openplan/.venv/lib/python3.13/site-packages/pydantic/main.py", line 250, in __init__
     validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
 pydantic_core._pydantic_core.ValidationError: 4 validation errors for Feature
 id
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
+  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.12/v/missing
 title
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
+  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.12/v/missing
 description
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
+  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.12/v/missing
 acceptance_criteria
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
+  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.12/v/missing
-[22:55:16] Decomposing epic: epic-002 — Publication Scoring and Digest Generation
-[22:56:15]   ERROR decomposing epic-002: 4 validation errors for Feature
-id
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-title
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-description
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
+[07:07:23] Stabilizing: feature-002 — Implement validation logic to ensure profile searc
+[07:07:46]   ERROR stabilizing feature-002: 1 validation error for Feature
 acceptance_criteria
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
+  Field required [type=missing, input_value={'Acceptance criteria': [...il Template Management'}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.12/v/missing
 Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 77, in <module>
-    features = engine.decompose_epic(epic)
-  File "/home/admin/.openclaw/workspace/openplan/openplan/core/engine.py", line 159, in decompose_epic
-    feature = Feature(**feature_data)
+  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 99, in <module>
+    stable = stabilizer.stabilize(feature)
+  File "/home/admin/.openclaw/workspace/openplan/openplan/core/stabilizer.py", line 43, in stabilize
+    feature = Feature(**stabilized_data)
   File "/home/admin/.openclaw/workspace/openplan/.venv/lib/python3.13/site-packages/pydantic/main.py", line 250, in __init__
     validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
-pydantic_core._pydantic_core.ValidationError: 4 validation errors for Feature
-id
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-title
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-description
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
+pydantic_core._pydantic_core.ValidationError: 1 validation error for Feature
 acceptance_criteria
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
+  Field required [type=missing, input_value={'Acceptance criteria': [...il Template Management'}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.12/v/missing
-[22:56:15] Decomposing epic: epic-003 — Email Alert System
-[23:00:21]   ERROR decomposing epic-003: 4 validation errors for Feature
-id
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-title
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-description
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-acceptance_criteria
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
+[07:07:46] Stabilizing: feature-003 — Enable automated fetching of papers matching defin
+[07:07:53]   → spec_ready=True, criteria=3
+[07:07:53] Stabilizing: feature-004 — Provide functionality to list and search through s
+[07:08:38]   → spec_ready=True, criteria=5
+[07:08:38] Stabilizing: feature-005 — Allow researchers to update, modify, and delete ex
+[07:08:46]   ERROR stabilizing feature-005: 1 validation error for Feature
+dependencies
+  Input should be a valid list [type=list_type, input_value='feature-001', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/list_type
 Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 77, in <module>
-    features = engine.decompose_epic(epic)
-  File "/home/admin/.openclaw/workspace/openplan/openplan/core/engine.py", line 159, in decompose_epic
-    feature = Feature(**feature_data)
+  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 99, in <module>
+    stable = stabilizer.stabilize(feature)
+  File "/home/admin/.openclaw/workspace/openplan/openplan/core/stabilizer.py", line 43, in stabilize
+    stabilized_data["spec_ready"] = True
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "/home/admin/.openclaw/workspace/openplan/.venv/lib/python3.13/site-packages/pydantic/main.py", line 250, in __init__
     validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
-pydantic_core._pydantic_core.ValidationError: 4 validation errors for Feature
-id
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-title
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-description
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-acceptance_criteria
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-[23:00:21] 
-Total features generated: 0
-[23:00:21] 
-============================================================
-[23:00:21]   PHASE 2: FEATURE STABILIZATION
-[23:00:21] ============================================================
-[23:00:21] 
-Stabilized: 0/0 features spec_ready
-[23:00:21] 
-============================================================
-[23:00:21]   PHASE 3: OPENSPEC EXPORT
-[23:00:21] ============================================================
-[23:00:21] 
-Exported 0 features to OpenSpec
-[23:00:21] 
-============================================================
-[23:00:21]   PHASE 4: IMPLEMENTATION VIA OPENCODE
-[23:00:21] ============================================================
-[23:00:21] 
-============================================================
-[23:00:21]   PIPELINE COMPLETE
-[23:00:21] ============================================================
-[23:00:21] 
-# OpenPlan Pubwatch Pipeline — Results
-
-**Roadmap:** road-map-001 — PubWatch - Researcher Publication Alert System
-**Epics:** 3
-**Features generated:** 0
-**Features stabilized:** 0
-**Features exported to OpenSpec:** 0
-**Features implemented:** 0
-
-## Epic Breakdown
-- **epic-001** (decompose_failed: 4 validation errors for Feature
-id
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-title
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-description
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-acceptance_criteria
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing): none
-- **epic-002** (decompose_failed: 4 validation errors for Feature
-id
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-title
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-description
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-acceptance_criteria
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing): none
-- **epic-003** (decompose_failed: 4 validation errors for Feature
-id
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-title
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-description
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-acceptance_criteria
-  Field required [type=missing, input_value={'feature-1': {'id': 'fea...', 'spec_ready': False}}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing): none
-
-## Implementation Results
+pydantic_core._pydantic_core.ValidationError: 1 validation error for Feature
+dependencies
+  Input should be a valid list [type=list_type, input_value='feature-001', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/list_type
+[07:08:46] Stabilizing: feature-006 — Enable researchers to export and import topic prof
