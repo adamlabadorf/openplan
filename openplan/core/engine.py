@@ -150,18 +150,36 @@ class PlanningEngine:
                     schema_class=None,
                     artifact_type="feature",
                 )
-                if not isinstance(features_yaml, list):
-                    features_yaml = [features_yaml]
+                features_list = self._normalize_features(features_yaml, epic.id)
                 features = []
-                for feature_data in features_yaml:
-                    if not isinstance(feature_data, dict):
-                        continue
+                for feature_data in features_list:
                     feature = Feature(**feature_data)
                     features.append(feature)
                     self._persist_feature(feature)
                 return features
             finally:
                 self._client = None
+
+    def _normalize_features(self, raw: object, epic_id: str) -> list[dict]:
+        """Normalize LLM output into a list of feature dicts.
+
+        Handles multiple output shapes:
+        - list of dicts (correct)
+        - single dict (one feature)
+        - dict of {key: feature_dict} (keyed map — common LLM mistake)
+        """
+        if isinstance(raw, list):
+            return [f for f in raw if isinstance(f, dict)]
+
+        if isinstance(raw, dict):
+            # Check if it looks like a keyed map: {"feature-1": {...}, ...}
+            first_val = next(iter(raw.values()), None)
+            if isinstance(first_val, dict):
+                return list(raw.values())
+            # Single feature dict
+            return [raw]
+
+        return []
 
     def _generate_with_refinement(
         self,
