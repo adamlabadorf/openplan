@@ -1,18 +1,36 @@
 acceptance_criteria:
-- Given a researcher has defined a topic profile, when they run pubwatch fetch, then
-  new papers matching the profile are retrieved and stored locally within 30 seconds,
-  with a minimum of 95% success rate across 100 fetch operations
-- Given a paper has been fetched, when the researcher runs pubwatch list, then the
-  paper appears in the local database with title, authors, and abstract, and all fields
-  are correctly parsed and displayed with 100% accuracy for 1000 records
-- Given the NCBI API returns a rate limit error, when pubwatch retries, then it uses
-  exponential backoff with jitter and succeeds within 3 attempts, with an average
-  retry delay of 1.5 seconds for the first retry and 3 seconds for the second retry
+- Given papers have been fetched for a profile, when a researcher runs pubwatch digest
+  generate, then a formatted email digest is created with top papers and their metadata
+  including title, authors, publication date, and links
+- Given a researcher has configured email settings, when they run pubwatch digest
+  send, then the email digest is sent to their configured email address with proper
+  email headers and content
+- Given an email digest has been generated, when the researcher runs pubwatch digest
+  view, then the digest content is displayed in the terminal with paper titles and
+  links in a readable format
+- Given a researcher has not configured email settings, when they run pubwatch digest
+  send, then an error message is displayed indicating email settings are not configured
+- Given papers have not been fetched for a profile, when a researcher runs pubwatch
+  digest generate, then an error message is displayed indicating that papers need
+  to be fetched first
+- Given the email digest contains more than 10 papers, when a researcher runs pubwatch
+  digest generate, then only the top 10 papers are included in the digest
+- Given a researcher has configured email settings, when they run pubwatch digest
+  send, then a success message is displayed confirming the email was sent
+- Given the email digest is generated successfully, when a researcher runs pubwatch
+  digest view, then the terminal output format is consistent and readable with proper
+  spacing and formatting
+- Given a researcher runs pubwatch digest send without internet connection, when a
+  researcher has configured email settings, then an error message is displayed indicating
+  that the email could not be sent due to connection issues
+- Given multiple researcher profiles exist, when a researcher runs pubwatch digest
+  generate for a specific profile, then only papers for that specific profile are
+  included in the digest
 complexity: medium
 dependencies:
-- feature-001
-description: Enable automated fetching of papers matching defined topic profiles and
-  storing them locally for later retrieval.
+- feature-002
+description: A feature to generate and format weekly email digests of top papers for
+  each researcher profile
 id: feature-003
 spec_ready: true
-title: Paper Fetching and Storage
+title: Email Digest Generation

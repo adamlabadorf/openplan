@@ -1,10 +1,17 @@
 acceptance_criteria:
-- Given the system is running, when performance metrics are collected, then average
-  time saved per researcher is calculated and displayed
-- Given a researcher uses the system, when they run fetch and list commands, then
-  performance is measured and logged
-- Given a researcher generates multiple digests, when they compare results, then time
-  saved metrics are tracked and improved
+- Given the system is running and performance metrics are being collected, when a
+  researcher executes a fetch command, then the system logs the execution time and
+  displays the average time saved per researcher
+- Given a researcher is using the system, when they run a list command, then the system
+  measures the command execution time and logs the performance metric
+- Given a researcher has generated multiple digests, when they compare results using
+  the system's comparison tool, then the system tracks and displays the time saved
+  metrics for each comparison
+- Given the system is monitoring performance metrics, when a researcher runs multiple
+  fetch operations, then the system aggregates and displays the total time saved per
+  researcher
+- Given a researcher generates a digest, when they use the system's performance dashboard,
+  then the system displays the time saved metric for that specific digest
 complexity: low
 dependencies:
 - feature-001
@@ -13,5 +20,5 @@ dependencies:
 description: A feature to monitor system performance and measure success metrics for
   time saved per researcher.
 id: feature-006
-spec_ready: false
+spec_ready: true
 title: Performance Monitoring

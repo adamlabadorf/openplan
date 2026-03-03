@@ -1,15 +1,24 @@
 acceptance_criteria:
-  - Given a researcher wants to customize email content, when they run pubwatch template
-    edit, then they can modify the email template with placeholders for paper data
-  - Given an email template has been edited, when the system generates a digest, then
-    the custom template is applied to the paper data
-  - Given a researcher wants to revert to a default template, when they run pubwatch
-    template reset, then the default template is restored for that profile
+- Given a researcher has accessed the pubwatch template edit command, when they provide
+  a custom email template with placeholders for paper data, then the system saves
+  the template and validates that placeholders are properly formatted
+- Given a researcher has saved a custom email template, when the system generates
+  a digest for a paper, then the custom template is applied and paper data is correctly
+  substituted into the placeholders
+- Given a researcher has edited an email template, when they run pubwatch template
+  reset command, then the system restores the default template for that profile and
+  removes any custom template settings
+- Given a researcher accesses the pubwatch template edit command with no existing
+  template, when they provide a valid custom template, then the system creates a new
+  custom template and applies it to subsequent digests
+- Given a researcher has a custom email template saved, when they attempt to run pubwatch
+  template reset without specifying a profile, then the system prompts for profile
+  selection or applies reset to the default profile
 complexity: medium
 dependencies:
-  - feature-003
+- feature-003
 description: A feature to configure and customize email templates for different types
   of paper digests
 id: feature-005
-spec_ready: false
+spec_ready: true
 title: Email Template Management

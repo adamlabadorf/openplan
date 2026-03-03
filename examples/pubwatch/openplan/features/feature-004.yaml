@@ -1,24 +1,25 @@
 acceptance_criteria:
-- Given a researcher has stored papers from multiple profiles, when they run pubwatch
-  list, then papers are displayed grouped by their associated profile with profile
-  names clearly labeled and sorted alphabetically, with 100% accuracy for 1000 records
-- Given a researcher filters papers by date range, when they submit the filter, then
-  only papers within that range are shown with 100% accuracy for 1000 records, and
-  invalid date inputs are rejected with appropriate error messages
-- Given a researcher searches within paper content, when they submit the query, then
-  matching papers are displayed with search term highlighted in all matching fields
-  (title, abstract, authors) with 95% accuracy for 1000 records, and invalid search
-  queries are rejected with appropriate error messages
-- Given a researcher runs pubwatch list with no stored papers, when they submit the
-  command, then an empty list is displayed with a clear "No papers found" message
-- Given a researcher runs pubwatch list with papers stored, when they submit the command,
-  then the list displays with default sorting by publication date (newest first) with
-  100% accuracy for 1000 records
-complexity: medium
+- Given a researcher has configured email preferences with a valid email address and
+  subscription, when the scheduler runs at the designated time, then an email digest
+  is automatically generated and sent to the researcher's configured email address
+- Given a researcher wants to disable email automation for their profile, when they
+  run the pubwatch email disable command with their profile identifier, then the automated
+  email sending is stopped for that specific profile and no further emails are sent
+  to that researcher
+- Given an email fails to send due to a temporary network error, when the system retries
+  the send operation, then it logs the specific error message to the system logs and
+  attempts to resend the email within 24 hours
+- Given a researcher has multiple profiles with different email preferences, when
+  the scheduler runs, then separate email digests are generated and sent for each
+  profile according to their individual subscription settings
+- Given an email fails to send due to a permanent error such as invalid email address,
+  when the system retries the send operation, then it logs the permanent failure error
+  and stops attempting to send further emails to that address
+complexity: high
 dependencies:
 - feature-003
-description: Provide functionality to list and search through stored papers that match
-  defined topic profiles.
+description: A feature to automatically schedule and send weekly email digests without
+  manual intervention
 id: feature-004
 spec_ready: true
-title: Paper Listing and Search
+title: Weekly Email Automation

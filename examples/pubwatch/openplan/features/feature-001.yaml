@@ -1,15 +1,40 @@
 acceptance_criteria:
 - Given a researcher wants to create a new topic profile, when they use the pubwatch
-  profile create command, then a new profile is saved with the specified keywords
-  and filters
-- Given a researcher has created profiles, when they run pubwatch profile list, then
-  all profiles are displayed with their keywords and last updated timestamp
+  profile create command with valid keywords and filters, then a new profile is saved
+  with the specified keywords and filters, and the command returns a success message
+  with the profile ID
+- Given a researcher has created profiles, when they run pubwatch profile list command,
+  then all profiles are displayed in a structured format with their keywords, last
+  updated timestamp, and profile ID
 - Given a researcher wants to modify a profile, when they use the pubwatch profile
-  update command, then the profile is updated with new keywords and filters
+  update command with new keywords and filters, then the profile is updated with new
+  keywords and filters, and the last updated timestamp is refreshed
+- Given a researcher has created a profile, when they use the pubwatch profile show
+  command with a valid profile ID, then the command displays the profile's keywords,
+  filters, creation timestamp, and last updated timestamp
+- Given a researcher wants to delete a profile, when they use the pubwatch profile
+  delete command with a valid profile ID, then the profile is removed from storage
+  and the command returns a success message
+- Given a researcher has created profiles, when they run pubwatch profile list command
+  with the --json flag, then all profiles are displayed in JSON format with complete
+  metadata including keywords, filters, timestamps, and profile ID
+- Given a researcher wants to create a profile with invalid input, when they use the
+  pubwatch profile create command with missing keywords or invalid filters, then the
+  command returns an error message and does not create a new profile
+- Given a researcher wants to update a profile with invalid input, when they use the
+  pubwatch profile update command with invalid keywords or filters, then the command
+  returns an error message and does not update the profile
+- Given a researcher runs pubwatch profile list command without any profiles, when
+  they execute the command, then the command returns a success message indicating
+  no profiles exist
+- Given a researcher wants to create a profile with special characters in keywords,
+  when they use the pubwatch profile create command with special characters in keywords
+  and filters, then a new profile is created successfully with the special characters
+  preserved in the keywords and filters
 complexity: low
 dependencies: []
 description: A feature to allow researchers to define and manage their topic profiles
   for paper filtering
 id: feature-001
-spec_ready: false
+spec_ready: true
 title: Topic Profile Management
