@@ -3,23 +3,21 @@
 Full OpenPlan → OpenSpec → OpenCode pipeline for pubwatch.
 
 Runs autonomously:
-  1. Decompose all 3 epics into features
+  1. Decompose all epics into features (epic-scoped IDs)
   2. Stabilize each feature (expand criteria, set spec_ready=True)
   3. Export spec-ready features to OpenSpec
-  4. Run /opsx-apply for each OpenSpec change via ACP
+  4. Run /opsx-ff + /opsx-apply for each OpenSpec change via ACP
 
 Writes a log to pipeline.log and a summary to pipeline_result.md.
 """
 
-import sys, os, json, time, traceback, yaml
+import sys, os, json, time, traceback, yaml, shutil
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "openplan"))
-sys.path.insert(0, os.path.expanduser("~/.openclaw/workspace/skills/opencode/tools"))
 
 PUBWATCH_DIR = Path(__file__).parent
 OPENPLAN_PKG = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(OPENPLAN_PKG))
+sys.path.insert(0, os.path.expanduser("~/.openclaw/workspace/skills/opencode/tools"))
 
 from openplan.core.engine import PlanningEngine, PlanningError
 from openplan.core.schemas import Epic, Feature, Roadmap
@@ -45,6 +43,15 @@ def section(title):
 # ── Setup ─────────────────────────────────────────────────────────────────────
 section("SETUP")
 
+# Clean stale feature files from prior runs to avoid ID collisions on disk
+features_dir = PUBWATCH_DIR / "openplan" / "features"
+if features_dir.exists():
+    stale = list(features_dir.glob("*.yaml"))
+    for f in stale:
+        f.unlink()
+    if stale:
+        log(f"Cleaned {len(stale)} stale feature files")
+
 engine = PlanningEngine(
     plan_dir=str(PUBWATCH_DIR / "openplan"),
     project_dir=str(PUBWATCH_DIR),
@@ -63,7 +70,8 @@ with open(roadmap_files[0]) as f:
     roadmap_data = yaml.safe_load(f)
 
 roadmap = Roadmap(**roadmap_data)
-log(f"Loaded roadmap: {roadmap.id} with {len(roadmap.epics)} epics")
+log(f"Loaded roadmap: {roadmap.id} — {roadmap.title}")
+log(f"Epics: {[e.id for e in roadmap.epics]}")
 
 
 # ── Phase 1: Decompose Epics ──────────────────────────────────────────────────
@@ -72,20 +80,18 @@ section("PHASE 1: EPIC DECOMPOSITION")
 all_features: list[Feature] = []
 
 for epic in roadmap.epics:
-    log(f"Decomposing epic: {epic.id} — {epic.title}")
+    log(f"Decomposing: {epic.id} — {epic.title}")
     try:
         features = engine.decompose_epic(epic)
-        log(f"  → {len(features)} features generated")
-        for f in features:
-            log(f"    - {f.id}: {f.description[:60]}")
+        log(f"  → {len(features)} features: {[f.id for f in features]}")
         all_features.extend(features)
         RESULT.append({"epic": epic.id, "features": [f.id for f in features], "status": "decomposed"})
     except Exception as e:
-        log(f"  ERROR decomposing {epic.id}: {e}")
+        log(f"  ERROR: {e}")
         RESULT.append({"epic": epic.id, "status": f"decompose_failed: {e}"})
         traceback.print_exc(file=LOG)
 
-log(f"\nTotal features generated: {len(all_features)}")
+log(f"\nTotal features: {len(all_features)}")
 
 
 # ── Phase 2: Stabilize Features ───────────────────────────────────────────────
@@ -94,23 +100,23 @@ section("PHASE 2: FEATURE STABILIZATION")
 stabilized: list[Feature] = []
 
 for feature in all_features:
-    log(f"Stabilizing: {feature.id} — {feature.description[:50]}")
+    log(f"Stabilizing: {feature.id}")
     try:
         stable = stabilizer.stabilize(feature)
         log(f"  → spec_ready={stable.spec_ready}, criteria={len(stable.acceptance_criteria)}")
         stabilized.append(stable)
     except Exception as e:
-        log(f"  ERROR stabilizing {feature.id}: {e}")
+        log(f"  ERROR: {e}")
         traceback.print_exc(file=LOG)
 
-log(f"\nStabilized: {len(stabilized)}/{len(all_features)} features spec_ready")
+log(f"\nStabilized: {len(stabilized)}/{len(all_features)}")
 
 
 # ── Phase 3: Export to OpenSpec ───────────────────────────────────────────────
 section("PHASE 3: OPENSPEC EXPORT")
 
 openspec_dir = PUBWATCH_DIR
-exported_changes: list[str] = []
+exported: list[Feature] = []
 
 for feature in stabilized:
     if not feature.spec_ready:
@@ -118,28 +124,24 @@ for feature in stabilized:
         continue
     log(f"Exporting: {feature.id}")
     try:
-        change_path = export_feature(
-            feature=feature,
-            openspec_dir=openspec_dir,
-        )
-        log(f"  → OpenSpec change created: {change_path}")
-        exported_changes.append(feature.id)
-    except ExportError as e:
-        log(f"  ERROR exporting {feature.id}: {e}")
+        change_path = export_feature(feature=feature, openspec_dir=openspec_dir)
+        log(f"  → {change_path}")
+        exported.append(feature)
     except Exception as e:
-        log(f"  ERROR exporting {feature.id}: {e}")
+        log(f"  ERROR: {e}")
         traceback.print_exc(file=LOG)
 
-log(f"\nExported {len(exported_changes)} features to OpenSpec")
+log(f"\nExported {len(exported)} features")
 
 
-# ── Phase 4: Implement via OpenCode /opsx-apply ───────────────────────────────
+# ── Phase 4: Implement via OpenCode ──────────────────────────────────────────
 section("PHASE 4: IMPLEMENTATION VIA OPENCODE")
 
 impl_results: list[dict] = []
 
-for change_id in exported_changes:
-    log(f"Implementing: {change_id}")
+for feature in exported:
+    change_id = feature.id
+    log(f"\nImplementing: {change_id} — {feature.title}")
     try:
         with ACPClient(cwd=str(PUBWATCH_DIR), permission="allow", agent="build") as client:
             client.initialize()
@@ -150,47 +152,54 @@ for change_id in exported_changes:
                     txt = u.get("content", {}).get("text", "")
                     if txt:
                         chunks.append(txt)
-            result = client.prompt(f"/opsx-apply {change_id}", on_update=on_update)
-            reply = "".join(chunks)
-            log(f"  → stop_reason={result['stop_reason']}")
-            log(f"  → reply preview: {reply[:200]}")
-            impl_results.append({"feature": change_id, "status": "done", "stop_reason": result["stop_reason"]})
+            # Fast-forward spec then apply
+            ff_prompt = f"/opsx-ff {change_id}\n\n{feature.title}\n\nGoal: {feature.description}\n\nAcceptance criteria:\n" + "\n".join(f"- {c}" for c in feature.acceptance_criteria)
+            ff_result = client.prompt(ff_prompt, on_update=on_update)
+            log(f"  ff done: {ff_result['stop_reason']}")
+
+            client.new_session()
+            chunks2 = []
+            def on_update2(t, u):
+                if t == "agent_message_chunk":
+                    txt = u.get("content", {}).get("text", "")
+                    if txt:
+                        chunks2.append(txt)
+            apply_result = client.prompt(f"/opsx-apply {change_id}", on_update=on_update2)
+            log(f"  apply done: {apply_result['stop_reason']}")
+            log(f"  preview: {''.join(chunks2)[:200]}")
+            impl_results.append({"feature": change_id, "status": "done"})
     except Exception as e:
-        log(f"  ERROR implementing {change_id}: {e}")
+        log(f"  ERROR: {e}")
         impl_results.append({"feature": change_id, "status": f"failed: {e}"})
         traceback.print_exc(file=LOG)
 
-    # Brief pause between sessions to avoid resource contention
-    time.sleep(5)
+    time.sleep(3)
 
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 section("PIPELINE COMPLETE")
 
-summary_lines = [
-    "# OpenPlan Pubwatch Pipeline — Results\n",
-    f"**Roadmap:** {roadmap.id} — {roadmap.title}",
-    f"**Epics:** {len(roadmap.epics)}",
-    f"**Features generated:** {len(all_features)}",
-    f"**Features stabilized:** {len(stabilized)}",
-    f"**Features exported to OpenSpec:** {len(exported_changes)}",
-    f"**Features implemented:** {len([r for r in impl_results if r['status'] == 'done'])}",
-    "",
-    "## Epic Breakdown",
-]
-for r in RESULT:
-    feats = r.get("features", [])
-    summary_lines.append(f"- **{r['epic']}** ({r['status']}): {', '.join(feats) if feats else 'none'}")
+done_count = len([r for r in impl_results if r["status"] == "done"])
+summary = f"""# OpenPlan Pubwatch Pipeline — Results
 
-summary_lines += ["", "## Implementation Results"]
-for r in impl_results:
-    summary_lines.append(f"- **{r['feature']}**: {r['status']}")
+**Roadmap:** {roadmap.id} — {roadmap.title}
+**Epics:** {len(roadmap.epics)}
+**Features generated:** {len(all_features)}
+**Features stabilized:** {len(stabilized)}
+**Features exported to OpenSpec:** {len(exported)}
+**Features implemented:** {done_count}
 
-summary = "\n".join(summary_lines)
+## Epic Breakdown
+""" + "\n".join(
+    f"- **{r['epic']}** ({r['status']}): {', '.join(r.get('features', []))}"
+    for r in RESULT
+) + "\n\n## Implementation Results\n" + "\n".join(
+    f"- **{r['feature']}**: {r['status']}" for r in impl_results
+)
 
 with open(PUBWATCH_DIR / "pipeline_result.md", "w") as f:
     f.write(summary)
 
 log("\n" + summary)
 LOG.close()
-print("\nDone. See pipeline_result.md for full summary.")
+print("\nDone. See pipeline_result.md")

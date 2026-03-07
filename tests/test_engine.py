@@ -199,7 +199,7 @@ class TestDecomposeEpic:
         features = engine.decompose_epic(sample_epic)
 
         assert len(features) == 1
-        assert features[0].id == "feature-1"
+        assert features[0].id == "epic-1-feature-1"
         assert features[0].title == "Create endpoint"
 
     @patch("openplan.core.engine.OpenCodeClient")

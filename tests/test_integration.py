@@ -139,7 +139,7 @@ def test_full_epic_decomposition(project_dir, mock_openplan_client):
     mock_client.generate.return_value = yaml.dump(
         [
             {
-                "id": "feature-1",
+                "id": "epic-1-feature-1",
                 "title": "Add Database Indexes",
                 "description": "Add indexes on frequently queried columns",
                 "acceptance_criteria": [
@@ -152,7 +152,7 @@ def test_full_epic_decomposition(project_dir, mock_openplan_client):
                 "spec_ready": False,
             },
             {
-                "id": "feature-2",
+                "id": "epic-1-feature-2",
                 "title": "Query Optimization",
                 "description": "Optimize slow queries",
                 "acceptance_criteria": [
@@ -160,7 +160,7 @@ def test_full_epic_decomposition(project_dir, mock_openplan_client):
                     "Rewrite queries for performance",
                     "Add query caching",
                 ],
-                "dependencies": ["feature-1"],
+                "dependencies": ["epic-1-feature-1"],
                 "complexity": "medium",
                 "spec_ready": False,
             },
@@ -173,8 +173,8 @@ def test_full_epic_decomposition(project_dir, mock_openplan_client):
     assert result.exit_code == 0, result.stdout
     assert "feature" in result.stdout.lower()
 
-    feature1_path = project_dir / "openplan" / "features" / "feature-1.yaml"
-    feature2_path = project_dir / "openplan" / "features" / "feature-2.yaml"
+    feature1_path = project_dir / "openplan" / "features" / "epic-1-feature-1.yaml"
+    feature2_path = project_dir / "openplan" / "features" / "epic-1-feature-2.yaml"
 
     assert feature1_path.exists()
     assert feature2_path.exists()
@@ -182,16 +182,16 @@ def test_full_epic_decomposition(project_dir, mock_openplan_client):
     with open(feature1_path) as f:
         feature1_data = yaml.safe_load(f)
 
-    assert feature1_data["id"] == "feature-1"
+    assert feature1_data["id"] == "epic-1-feature-1"
     assert len(feature1_data["acceptance_criteria"]) >= 3
 
 
 def test_feature_stabilization_pipeline(project_dir, mock_openplan_client):
     """Test decompose -> stabilize -> assert spec_ready=True in persisted YAML."""
-    feature_file = project_dir / "openplan" / "features" / "feature-1.yaml"
+    feature_file = project_dir / "openplan" / "features" / "epic-1-feature-1.yaml"
     feature_file.parent.mkdir(exist_ok=True)
     feature_file.write_text(
-        "id: feature-1\n"
+        "id: epic-1-feature-1\n"
         "title: Test Feature\n"
         "description: A test feature\n"
         "acceptance_criteria:\n"
@@ -206,7 +206,7 @@ def test_feature_stabilization_pipeline(project_dir, mock_openplan_client):
     mock_client = MagicMock()
     mock_client.generate.return_value = yaml.dump(
         {
-            "id": "feature-1",
+            "id": "epic-1-feature-1",
             "title": "Test Feature",
             "description": "A test feature",
             "acceptance_criteria": [
@@ -221,7 +221,7 @@ def test_feature_stabilization_pipeline(project_dir, mock_openplan_client):
     )
     mock_openplan_client.return_value.__enter__.return_value = mock_client
 
-    result = runner.invoke(app, ["stabilize-feature", "feature-1", str(project_dir)])
+    result = runner.invoke(app, ["stabilize-feature", "epic-1-feature-1", str(project_dir)])
 
     assert result.exit_code == 0, result.stdout
     assert "stabilized" in result.stdout.lower()
@@ -241,7 +241,7 @@ def test_openspec_export_blocked_if_not_ready(
     from openplan.core.schemas import Feature
 
     feature = Feature(
-        id="feature-1",
+        id="epic-1-feature-1",
         title="Test",
         description="Test feature",
         acceptance_criteria=["c1", "c2", "c3"],
@@ -268,8 +268,8 @@ def test_status_command(project_dir):
         "    unit: milliseconds\n"
     )
 
-    (project_dir / "openplan" / "features" / "feature-1.yaml").write_text(
-        "id: feature-1\n"
+    (project_dir / "openplan" / "features" / "epic-1-feature-1.yaml").write_text(
+        "id: epic-1-feature-1\n"
         "title: Test Feature\n"
         "description: Test\n"
         "acceptance_criteria:\n"
@@ -281,8 +281,8 @@ def test_status_command(project_dir):
         "spec_ready: true\n"
     )
 
-    (project_dir / "openplan" / "features" / "feature-2.yaml").write_text(
-        "id: feature-2\n"
+    (project_dir / "openplan" / "features" / "epic-1-feature-2.yaml").write_text(
+        "id: epic-1-feature-2\n"
         "title: Another Feature\n"
         "description: Test\n"
         "acceptance_criteria:\n"

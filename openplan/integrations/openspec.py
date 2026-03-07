@@ -76,6 +76,11 @@ def export_feature(
 
     openspec_input = feature_to_openspec_input(feature, arch_context)
 
+    # If the change already exists, remove it so we can recreate with fresh content
+    change_path = openspec_dir / "openspec" / "changes" / feature.id
+    if change_path.exists():
+        shutil.rmtree(change_path)
+
     result = subprocess.run(
         ["openspec", "new", "change", feature.id],
         cwd=str(openspec_dir),
@@ -87,9 +92,6 @@ def export_feature(
         raise ExportError(
             f"Failed to export feature '{feature.id}' to OpenSpec: {result.stderr}"
         )
-
-    # openspec creates changes under openspec/changes/ relative to cwd
-    change_path = openspec_dir / "openspec" / "changes" / feature.id
     proposal_file = change_path / "proposal.md"
 
     proposal_content = f"""# {feature.title}
