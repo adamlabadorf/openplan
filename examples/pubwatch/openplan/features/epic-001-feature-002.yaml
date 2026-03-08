@@ -1,0 +1,26 @@
+acceptance_criteria:
+- Given a paper matches the search terms for a topic profile "COVID-19 Research",
+  when a user runs pubwatch fetch --profile "COVID-19 Research", then the paper is
+  retrieved and stored in the local database with the profile ID "COVID-19 Research"
+  associated with it
+- Given multiple profiles exist including "Viral Pathogens" and "Bacterial Infections",
+  when a user runs pubwatch fetch --profile "Viral Pathogens", then papers matching
+  that profile's search terms are fetched and stored in the local database with correct
+  profile metadata linking them to the "Viral Pathogens" profile
+- Given a fetch operation fails with a rate limit error during pubwatch fetch, when
+  the system retries the fetch, then it uses exponential backoff strategy and succeeds
+  within 3 attempts
+- Given a paper matches multiple profiles' search terms, when a user runs pubwatch
+  fetch --profile "Bacterial Infections", then only papers matching the specific profile's
+  search terms are retrieved and associated with that profile in the local database
+- Given a profile has no matching papers, when a user runs pubwatch fetch --profile
+  "Non-Existent Topic", then the fetch operation completes successfully without errors
+  and returns zero results for that profile
+complexity: medium
+dependencies:
+- feature-001
+description: Allow researchers to fetch papers using saved topic profiles, automatically
+  matching fetched papers to the appropriate profile based on search terms.
+id: epic-001-feature-002
+spec_ready: true
+title: Paper Fetching with Profile Matching

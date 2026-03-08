@@ -1,0 +1,21 @@
+acceptance_criteria:
+- Given a paper has been stored locally, when the scoring engine processes it, then
+  the paper is assigned a relevance score between 0.0 and 1.0 for each topic profile
+- Given a paper has a high relevance score (>= 0.8), when the researcher views their
+  dashboard, then the paper appears in the top 10% of their relevant papers list
+- Given multiple papers are scored with varying relevance scores, when the system
+  aggregates results, then papers are ranked by overall relevance to each profile
+  in descending order
+- Given a paper has been processed and scored, when the scoring engine is queried
+  for the paper's scores, then it returns all topic profile scores within 500ms
+- Given a researcher has multiple topic profiles, when the dashboard displays relevant
+  papers, then papers are grouped by topic profile with appropriate relevance score
+  labels
+complexity: medium
+dependencies:
+- feature-001
+description: A service that scores incoming publications based on relevance to each
+  topic profile to rank papers by importance and interest.
+id: epic-002-feature-002
+spec_ready: true
+title: Publication Scoring Engine

@@ -1,0 +1,39 @@
+acceptance_criteria:
+- Given a researcher is on the topic profile creation page, when they submit valid
+  profile details including name, description, and tags, then the system validates
+  all required fields, generates a unique ID, and stores the profile in the database
+- Given a researcher has created at least one topic profile, when they navigate to
+  the profiles list view, then all profiles are displayed with their name, description,
+  and last updated timestamp in descending order by date
+- Given a researcher is viewing an existing topic profile, when they update the profile
+  name or description fields and submit the changes, then the system validates the
+  input, updates the profile in the database, and reflects the changes immediately
+  in the UI
+- Given a researcher is on the topic profile creation page, when they submit invalid
+  profile details with missing required fields, then the system displays appropriate
+  validation error messages for each missing field
+- Given a researcher has existing topic profiles, when they search for a specific
+  profile by name or description, then the system filters and displays only the matching
+  profiles in real-time
+- Given a researcher is viewing an existing topic profile, when they update the tags
+  field and submit the changes, then the system validates tag format, saves updated
+  tags, and reflects the changes immediately in subsequent paper fetching
+- Given a researcher has created multiple topic profiles with different names, when
+  they sort the profile list by name or last updated timestamp, then the system displays
+  profiles sorted correctly according to the selected criteria
+- Given a researcher is editing an existing topic profile, when they submit changes
+  that result in duplicate profile names, then the system prevents saving and displays
+  an error message indicating the name conflict
+- Given a researcher has created a topic profile, when they delete the profile and
+  confirm the action, then the system removes the profile from the database and updates
+  the UI to reflect the updated list
+- Given a researcher is viewing the profiles list, when they open the export functionality,
+  then the system allows exporting all profiles in CSV format with name, description,
+  tags, and last updated timestamp columns
+complexity: low
+dependencies: []
+description: A service to allow researchers to define and manage their topic profiles
+  for paper triage.
+id: epic-003-feature-001
+spec_ready: true
+title: Topic Profile Management

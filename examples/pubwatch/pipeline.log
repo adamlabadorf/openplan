@@ -1,341 +1,109 @@
-[07:06:14] 
+[08:07:02] 
 ============================================================
-[07:06:14]   SETUP
-[07:06:14] ============================================================
-[07:06:14] Loaded roadmap: road-map-001 with 3 epics
-[07:06:14] 
+[08:07:02]   SETUP
+[08:07:02] ============================================================
+[08:07:02] Cleaned 14 stale feature files
+[08:07:02] Loaded roadmap: road-map-001 — PubWatch - Researcher Publication Alert System
+[08:07:02] Epics: ['epic-001', 'epic-002', 'epic-003']
+[08:07:02] 
 ============================================================
-[07:06:14]   PHASE 1: EPIC DECOMPOSITION
-[07:06:14] ============================================================
-[07:06:14] Decomposing epic: epic-001 — Topic Profile Management
-[07:06:38]   → 6 features generated
-[07:06:38]     - feature-001: Enable researchers to create named topic profiles with defin
-[07:06:38]     - feature-002: Implement validation logic to ensure profile search criteria
-[07:06:38]     - feature-003: Enable automated fetching of papers matching defined topic p
-[07:06:38]     - feature-004: Provide functionality to list and search through stored pape
-[07:06:38]     - feature-005: Allow researchers to update, modify, and delete existing top
-[07:06:38]     - feature-006: Enable researchers to export and import topic profiles for s
-[07:06:38] Decomposing epic: epic-002 — Publication Scoring and Digest Generation
-[07:06:57]   → 6 features generated
-[07:06:57]     - feature-001: A feature to fetch publications from NCBI API and store them
-[07:06:57]     - feature-002: A feature to score incoming publications for relevance to ea
-[07:06:57]     - feature-003: A service to generate and deliver weekly ranked paper digest
-[07:06:57]     - feature-004: A feature to deliver weekly ranked paper digests to research
-[07:06:57]     - feature-005: A feature to allow researchers to create, update, and manage
-[07:06:57]     - feature-006: A feature to monitor system performance and measure success 
-[07:06:57] Decomposing epic: epic-003 — Email Alert System
-[07:07:14]   → 5 features generated
-[07:07:14]     - feature-001: A feature to allow researchers to define and manage their to
-[07:07:14]     - feature-002: A feature to automatically fetch papers from PubMed based on
-[07:07:14]     - feature-003: A feature to generate and format weekly email digests of top
-[07:07:14]     - feature-004: A feature to automatically schedule and send weekly email di
-[07:07:14]     - feature-005: A feature to configure and customize email templates for dif
-[07:07:14] 
-Total features generated: 17
-[07:07:14] 
+[08:07:02]   PHASE 1: EPIC DECOMPOSITION
+[08:07:02] ============================================================
+[08:07:02] Decomposing: epic-001 — Topic Profile Management
+[08:07:34]   → 4 features: ['epic-001-feature-001', 'epic-001-feature-002', 'epic-001-feature-003', 'epic-001-feature-004']
+[08:07:34] Decomposing: epic-002 — Publication Scoring and Digest Generation
+[08:07:48]   → 4 features: ['epic-002-feature-001', 'epic-002-feature-002', 'epic-002-feature-003', 'epic-002-feature-004']
+[08:07:48] Decomposing: epic-003 — Email Alert System
+[08:08:05]   → 5 features: ['epic-003-feature-001', 'epic-003-feature-002', 'epic-003-feature-003', 'epic-003-feature-004', 'epic-003-feature-005']
+[08:08:05] 
+Total features: 13
+[08:08:05] 
 ============================================================
-[07:07:14]   PHASE 2: FEATURE STABILIZATION
-[07:07:14] ============================================================
-[07:07:14] Stabilizing: feature-001 — Enable researchers to create named topic profiles 
-[07:07:23]   ERROR stabilizing feature-001: 4 validation errors for Feature
-id
-  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-title
-  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-description
-  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-acceptance_criteria
-  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 99, in <module>
-    stable = stabilizer.stabilize(feature)
-  File "/home/admin/.openclaw/workspace/openplan/openplan/core/stabilizer.py", line 43, in stabilize
-    feature = Feature(**stabilized_data)
-  File "/home/admin/.openclaw/workspace/openplan/.venv/lib/python3.13/site-packages/pydantic/main.py", line 250, in __init__
-    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
-pydantic_core._pydantic_core.ValidationError: 4 validation errors for Feature
-id
-  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-title
-  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-description
-  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-acceptance_criteria
-  Field required [type=missing, input_value={'feature': {'name': 'Cod...e'}, 'spec_ready': True}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-[07:07:23] Stabilizing: feature-002 — Implement validation logic to ensure profile searc
-[07:07:46]   ERROR stabilizing feature-002: 1 validation error for Feature
-acceptance_criteria
-  Field required [type=missing, input_value={'Acceptance criteria': [...il Template Management'}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 99, in <module>
-    stable = stabilizer.stabilize(feature)
-  File "/home/admin/.openclaw/workspace/openplan/openplan/core/stabilizer.py", line 43, in stabilize
-    feature = Feature(**stabilized_data)
-  File "/home/admin/.openclaw/workspace/openplan/.venv/lib/python3.13/site-packages/pydantic/main.py", line 250, in __init__
-    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
-pydantic_core._pydantic_core.ValidationError: 1 validation error for Feature
-acceptance_criteria
-  Field required [type=missing, input_value={'Acceptance criteria': [...il Template Management'}, input_type=dict]
-    For further information visit https://errors.pydantic.dev/2.12/v/missing
-[07:07:46] Stabilizing: feature-003 — Enable automated fetching of papers matching defin
-[07:07:53]   → spec_ready=True, criteria=3
-[07:07:53] Stabilizing: feature-004 — Provide functionality to list and search through s
-[07:08:38]   → spec_ready=True, criteria=5
-[07:08:38] Stabilizing: feature-005 — Allow researchers to update, modify, and delete ex
-[07:08:46]   ERROR stabilizing feature-005: 1 validation error for Feature
-dependencies
-  Input should be a valid list [type=list_type, input_value='feature-001', input_type=str]
-    For further information visit https://errors.pydantic.dev/2.12/v/list_type
-Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 99, in <module>
-    stable = stabilizer.stabilize(feature)
-  File "/home/admin/.openclaw/workspace/openplan/openplan/core/stabilizer.py", line 43, in stabilize
-    stabilized_data["spec_ready"] = True
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.openclaw/workspace/openplan/.venv/lib/python3.13/site-packages/pydantic/main.py", line 250, in __init__
-    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
-pydantic_core._pydantic_core.ValidationError: 1 validation error for Feature
-dependencies
-  Input should be a valid list [type=list_type, input_value='feature-001', input_type=str]
-    For further information visit https://errors.pydantic.dev/2.12/v/list_type
-[07:08:46] Stabilizing: feature-006 — Enable researchers to export and import topic prof
-[07:08:57]   ERROR stabilizing feature-006: 1 validation error for Feature
-dependencies
-  Input should be a valid list [type=list_type, input_value='feature-001', input_type=str]
-    For further information visit https://errors.pydantic.dev/2.12/v/list_type
-Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 99, in <module>
-    stable = stabilizer.stabilize(feature)
-  File "/home/admin/.openclaw/workspace/openplan/openplan/core/stabilizer.py", line 43, in stabilize
-    stabilized_data["spec_ready"] = True
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.openclaw/workspace/openplan/.venv/lib/python3.13/site-packages/pydantic/main.py", line 250, in __init__
-    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
-pydantic_core._pydantic_core.ValidationError: 1 validation error for Feature
-dependencies
-  Input should be a valid list [type=list_type, input_value='feature-001', input_type=str]
-    For further information visit https://errors.pydantic.dev/2.12/v/list_type
-[07:08:57] Stabilizing: feature-001 — A feature to fetch publications from NCBI API and 
-[07:09:08]   → spec_ready=True, criteria=10
-[07:09:08] Stabilizing: feature-002 — A feature to score incoming publications for relev
-[07:09:16]   → spec_ready=True, criteria=5
-[07:09:16] Stabilizing: feature-003 — A service to generate and deliver weekly ranked pa
-[07:09:24]   → spec_ready=True, criteria=5
-[07:09:24] Stabilizing: feature-004 — A feature to deliver weekly ranked paper digests t
-[07:09:33]   → spec_ready=True, criteria=10
-[07:09:33] Stabilizing: feature-005 — A feature to allow researchers to create, update, 
-[07:09:43]   → spec_ready=True, criteria=10
-[07:09:43] Stabilizing: feature-006 — A feature to monitor system performance and measur
-[07:09:51]   → spec_ready=True, criteria=5
-[07:09:51] Stabilizing: feature-001 — A feature to allow researchers to define and manag
-[07:10:03]   → spec_ready=True, criteria=10
-[07:10:03] Stabilizing: feature-002 — A feature to automatically fetch papers from PubMe
-[07:10:13]   → spec_ready=True, criteria=10
-[07:10:13] Stabilizing: feature-003 — A feature to generate and format weekly email dige
-[07:10:24]   → spec_ready=True, criteria=10
-[07:10:24] Stabilizing: feature-004 — A feature to automatically schedule and send weekl
-[07:10:32]   → spec_ready=True, criteria=5
-[07:10:32] Stabilizing: feature-005 — A feature to configure and customize email templat
-[07:10:40]   → spec_ready=True, criteria=5
-[07:10:40] 
-Stabilized: 13/17 features spec_ready
-[07:10:40] 
+[08:08:05]   PHASE 2: FEATURE STABILIZATION
+[08:08:05] ============================================================
+[08:08:05] Stabilizing: epic-001-feature-001
+[08:08:14]   → spec_ready=True, criteria=5
+[08:08:14] Stabilizing: epic-001-feature-002
+[08:08:23]   → spec_ready=True, criteria=5
+[08:08:23] Stabilizing: epic-001-feature-003
+[08:08:33]   → spec_ready=True, criteria=5
+[08:08:33] Stabilizing: epic-001-feature-004
+[08:08:43]   → spec_ready=True, criteria=7
+[08:08:43] Stabilizing: epic-002-feature-001
+[08:08:51]   → spec_ready=True, criteria=5
+[08:08:51] Stabilizing: epic-002-feature-002
+[08:08:59]   → spec_ready=True, criteria=5
+[08:08:59] Stabilizing: epic-002-feature-003
+[08:09:06]   → spec_ready=True, criteria=5
+[08:09:06] Stabilizing: epic-002-feature-004
+[08:09:16]   → spec_ready=True, criteria=10
+[08:09:16] Stabilizing: epic-003-feature-001
+[08:09:27]   → spec_ready=True, criteria=10
+[08:09:27] Stabilizing: epic-003-feature-002
+[08:09:35]   → spec_ready=True, criteria=5
+[08:09:35] Stabilizing: epic-003-feature-003
+[08:09:43]   → spec_ready=True, criteria=5
+[08:09:43] Stabilizing: epic-003-feature-004
+[08:09:51]   → spec_ready=True, criteria=5
+[08:09:51] Stabilizing: epic-003-feature-005
+[08:09:57]   → spec_ready=True, criteria=5
+[08:09:57] 
+Stabilized: 13/13
+[08:09:57] 
 ============================================================
-[07:10:40]   PHASE 3: OPENSPEC EXPORT
-[07:10:40] ============================================================
-[07:10:40] Exporting: feature-003
-[07:10:40]   ERROR exporting feature-003: [Errno 2] No such file or directory: '/home/admin/.openclaw/workspace/openplan/examples/pubwatch/changes/feature-003/proposal.md'
-Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 121, in <module>
-    change_path = export_feature(
-        feature=feature,
-        openspec_dir=openspec_dir,
-    )
-  File "/home/admin/.openclaw/workspace/openplan/openplan/integrations/openspec.py", line 114, in export_feature
-    proposal_file.write_text(proposal_content)
-    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_local.py", line 555, in write_text
-    return PathBase.write_text(self, data, encoding, errors, newline)
-           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_abc.py", line 651, in write_text
-    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
-         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_local.py", line 537, in open
-    return io.open(self, mode, buffering, encoding, errors, newline)
-           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: '/home/admin/.openclaw/workspace/openplan/examples/pubwatch/changes/feature-003/proposal.md'
-[07:10:40] Exporting: feature-004
-[07:10:40]   ERROR exporting feature-004: [Errno 2] No such file or directory: '/home/admin/.openclaw/workspace/openplan/examples/pubwatch/changes/feature-004/proposal.md'
-Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 121, in <module>
-    change_path = export_feature(
-        feature=feature,
-        openspec_dir=openspec_dir,
-    )
-  File "/home/admin/.openclaw/workspace/openplan/openplan/integrations/openspec.py", line 114, in export_feature
-    proposal_file.write_text(proposal_content)
-    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_local.py", line 555, in write_text
-    return PathBase.write_text(self, data, encoding, errors, newline)
-           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_abc.py", line 651, in write_text
-    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
-         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_local.py", line 537, in open
-    return io.open(self, mode, buffering, encoding, errors, newline)
-           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: '/home/admin/.openclaw/workspace/openplan/examples/pubwatch/changes/feature-004/proposal.md'
-[07:10:40] Exporting: feature-001
-[07:10:41]   ERROR exporting feature-001: [Errno 2] No such file or directory: '/home/admin/.openclaw/workspace/openplan/examples/pubwatch/changes/feature-001/proposal.md'
-Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 121, in <module>
-    change_path = export_feature(
-        feature=feature,
-        openspec_dir=openspec_dir,
-    )
-  File "/home/admin/.openclaw/workspace/openplan/openplan/integrations/openspec.py", line 114, in export_feature
-    proposal_file.write_text(proposal_content)
-    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_local.py", line 555, in write_text
-    return PathBase.write_text(self, data, encoding, errors, newline)
-           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_abc.py", line 651, in write_text
-    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
-         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_local.py", line 537, in open
-    return io.open(self, mode, buffering, encoding, errors, newline)
-           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: '/home/admin/.openclaw/workspace/openplan/examples/pubwatch/changes/feature-001/proposal.md'
-[07:10:41] Exporting: feature-002
-[07:10:41]   ERROR exporting feature-002: [Errno 2] No such file or directory: '/home/admin/.openclaw/workspace/openplan/examples/pubwatch/changes/feature-002/proposal.md'
-Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 121, in <module>
-    change_path = export_feature(
-        feature=feature,
-        openspec_dir=openspec_dir,
-    )
-  File "/home/admin/.openclaw/workspace/openplan/openplan/integrations/openspec.py", line 114, in export_feature
-    proposal_file.write_text(proposal_content)
-    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_local.py", line 555, in write_text
-    return PathBase.write_text(self, data, encoding, errors, newline)
-           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_abc.py", line 651, in write_text
-    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
-         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_local.py", line 537, in open
-    return io.open(self, mode, buffering, encoding, errors, newline)
-           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: '/home/admin/.openclaw/workspace/openplan/examples/pubwatch/changes/feature-002/proposal.md'
-[07:10:41] Exporting: feature-003
-[07:10:41]   ERROR exporting feature-003: Failed to export feature 'feature-003' to OpenSpec: - Creating change 'feature-003'...
-✖ Failed to create change 'feature-003'
-✖ Error: Change 'feature-003' already exists at /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/feature-003
-
-[07:10:41] Exporting: feature-004
-[07:10:41]   ERROR exporting feature-004: Failed to export feature 'feature-004' to OpenSpec: - Creating change 'feature-004'...
-✖ Failed to create change 'feature-004'
-✖ Error: Change 'feature-004' already exists at /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/feature-004
-
-[07:10:41] Exporting: feature-005
-[07:10:42]   ERROR exporting feature-005: [Errno 2] No such file or directory: '/home/admin/.openclaw/workspace/openplan/examples/pubwatch/changes/feature-005/proposal.md'
-Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 121, in <module>
-    change_path = export_feature(
-        feature=feature,
-        openspec_dir=openspec_dir,
-    )
-  File "/home/admin/.openclaw/workspace/openplan/openplan/integrations/openspec.py", line 114, in export_feature
-    proposal_file.write_text(proposal_content)
-    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_local.py", line 555, in write_text
-    return PathBase.write_text(self, data, encoding, errors, newline)
-           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_abc.py", line 651, in write_text
-    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
-         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_local.py", line 537, in open
-    return io.open(self, mode, buffering, encoding, errors, newline)
-           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: '/home/admin/.openclaw/workspace/openplan/examples/pubwatch/changes/feature-005/proposal.md'
-[07:10:42] Exporting: feature-006
-[07:10:42]   ERROR exporting feature-006: [Errno 2] No such file or directory: '/home/admin/.openclaw/workspace/openplan/examples/pubwatch/changes/feature-006/proposal.md'
-Traceback (most recent call last):
-  File "/home/admin/.openclaw/workspace/openplan/examples/pubwatch/run_pipeline.py", line 121, in <module>
-    change_path = export_feature(
-        feature=feature,
-        openspec_dir=openspec_dir,
-    )
-  File "/home/admin/.openclaw/workspace/openplan/openplan/integrations/openspec.py", line 114, in export_feature
-    proposal_file.write_text(proposal_content)
-    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_local.py", line 555, in write_text
-    return PathBase.write_text(self, data, encoding, errors, newline)
-           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_abc.py", line 651, in write_text
-    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
-         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/admin/.miniforge/lib/python3.13/pathlib/_local.py", line 537, in open
-    return io.open(self, mode, buffering, encoding, errors, newline)
-           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: '/home/admin/.openclaw/workspace/openplan/examples/pubwatch/changes/feature-006/proposal.md'
-[07:10:42] Exporting: feature-001
-[07:10:42]   ERROR exporting feature-001: Failed to export feature 'feature-001' to OpenSpec: - Creating change 'feature-001'...
-✖ Failed to create change 'feature-001'
-✖ Error: Change 'feature-001' already exists at /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/feature-001
-
-[07:10:42] Exporting: feature-002
-[07:10:42]   ERROR exporting feature-002: Failed to export feature 'feature-002' to OpenSpec: - Creating change 'feature-002'...
-✖ Failed to create change 'feature-002'
-✖ Error: Change 'feature-002' already exists at /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/feature-002
-
-[07:10:42] Exporting: feature-003
-[07:10:43]   ERROR exporting feature-003: Failed to export feature 'feature-003' to OpenSpec: - Creating change 'feature-003'...
-✖ Failed to create change 'feature-003'
-✖ Error: Change 'feature-003' already exists at /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/feature-003
-
-[07:10:43] Exporting: feature-004
-[07:10:43]   ERROR exporting feature-004: Failed to export feature 'feature-004' to OpenSpec: - Creating change 'feature-004'...
-✖ Failed to create change 'feature-004'
-✖ Error: Change 'feature-004' already exists at /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/feature-004
-
-[07:10:43] Exporting: feature-005
-[07:10:43]   ERROR exporting feature-005: Failed to export feature 'feature-005' to OpenSpec: - Creating change 'feature-005'...
-✖ Failed to create change 'feature-005'
-✖ Error: Change 'feature-005' already exists at /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/feature-005
-
-[07:10:43] 
-Exported 0 features to OpenSpec
-[07:10:43] 
+[08:09:57]   PHASE 3: OPENSPEC EXPORT
+[08:09:57] ============================================================
+[08:09:57] Exporting: epic-001-feature-001
+[08:09:58]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-001-feature-001
+[08:09:58] Exporting: epic-001-feature-002
+[08:09:58]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-001-feature-002
+[08:09:58] Exporting: epic-001-feature-003
+[08:09:59]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-001-feature-003
+[08:09:59] Exporting: epic-001-feature-004
+[08:09:59]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-001-feature-004
+[08:09:59] Exporting: epic-002-feature-001
+[08:09:59]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-002-feature-001
+[08:09:59] Exporting: epic-002-feature-002
+[08:10:00]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-002-feature-002
+[08:10:00] Exporting: epic-002-feature-003
+[08:10:00]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-002-feature-003
+[08:10:00] Exporting: epic-002-feature-004
+[08:10:00]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-002-feature-004
+[08:10:00] Exporting: epic-003-feature-001
+[08:10:01]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-003-feature-001
+[08:10:01] Exporting: epic-003-feature-002
+[08:10:01]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-003-feature-002
+[08:10:01] Exporting: epic-003-feature-003
+[08:10:01]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-003-feature-003
+[08:10:01] Exporting: epic-003-feature-004
+[08:10:01]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-003-feature-004
+[08:10:01] Exporting: epic-003-feature-005
+[08:10:02]   → /home/admin/.openclaw/workspace/openplan/examples/pubwatch/openspec/changes/epic-003-feature-005
+[08:10:02] 
+Exported 13 features
+[08:10:02] 
 ============================================================
-[07:10:43]   PHASE 4: IMPLEMENTATION VIA OPENCODE
-[07:10:43] ============================================================
-[07:10:43] 
-============================================================
-[07:10:43]   PIPELINE COMPLETE
-[07:10:43] ============================================================
-[07:10:43] 
-# OpenPlan Pubwatch Pipeline — Results
+[08:10:02]   PHASE 4: IMPLEMENTATION VIA OPENCODE
+[08:10:02] ============================================================
+[08:10:02] 
+Implementing: epic-001-feature-001 — Profile Creation and Storage
+[08:11:12]   ff done: end_turn
+[08:11:20]   apply done: end_turn
+[08:11:20]   preview: I notice that you've provided a list of available changes but haven't specified which one to work on. Based on the conversation context, I need to select a specific change to implement tasks from.
 
-**Roadmap:** road-map-001 — PubWatch - Researcher Publication Alert System
-**Epics:** 3
-**Features generated:** 17
-**Features stabilized:** 13
-**Features exported to OpenSpec:** 0
-**Features implemented:** 0
+Lo
+[08:11:23] 
+Implementing: epic-001-feature-002 — Paper Fetching with Profile Matching
+[08:13:05]   ff done: end_turn
+[08:13:26]   apply done: end_turn
+[08:13:26]   preview: I'll implement tasks from an OpenSpec change. First, I need to determine which change you want me to work on.
 
-## Epic Breakdown
-- **epic-001** (decomposed): feature-001, feature-002, feature-003, feature-004, feature-005, feature-006
-- **epic-002** (decomposed): feature-001, feature-002, feature-003, feature-004, feature-005, feature-006
-- **epic-003** (decomposed): feature-001, feature-002, feature-003, feature-004, feature-005
-
-## Implementation Results
+Since no specific change name was provided and there's no clear context about which chang
+[08:13:29] 
+Implementing: epic-001-feature-003 — Profile Management and Updates
+[08:14:46]   ff done: end_turn
+[08:15:11]   apply done: end_turn
+[08:15:11]   preview: I'll implement tasks from the OpenSpec change. First, I need to determine which change you want me to work on.I can see there are multiple OpenSpec changes available. Based on your input, you mentione
+[08:15:14] 
+Implementing: epic-001-feature-004 — Paper Listing by Profile
+[08:17:07]   ff done: end_turn

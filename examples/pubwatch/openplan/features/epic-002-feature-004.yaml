@@ -1,0 +1,29 @@
+acceptance_criteria:
+- Given a researcher has enabled email notifications, when a digest is generated,
+  then an email is sent with the top papers for their profiles
+- Given a researcher has enabled in-app notifications, when a digest is generated,
+  then a notification appears in their application
+- Given a researcher has not set up delivery preferences, when a digest is generated,
+  then it defaults to email delivery
+- Given a researcher has disabled both email and in-app notifications, when a digest
+  is generated, then no delivery occurs
+- Given a researcher has enabled email notifications, when a digest is generated,
+  then the email contains a list of top papers relevant to their profile
+- Given a researcher has enabled in-app notifications, when a digest is generated,
+  then the notification includes a link to view the full digest
+- Given a researcher has not set up delivery preferences, when a digest is generated,
+  then the system logs a default delivery preference for that user
+- Given a researcher has enabled email notifications, when a digest is generated,
+  then the email contains a timestamp of when it was generated
+- Given a researcher has enabled in-app notifications, when a digest is generated,
+  then the notification appears within 5 seconds of digest generation
+- Given a researcher has not set up delivery preferences, when a digest is generated,
+  then a default delivery preference is stored for that user in the system
+complexity: medium
+dependencies:
+- feature-003
+description: A system that delivers paper digests to researchers via email or in-app
+  notifications, ensuring they receive timely updates on relevant publications.
+id: epic-002-feature-004
+spec_ready: true
+title: Digest Delivery and Notification System

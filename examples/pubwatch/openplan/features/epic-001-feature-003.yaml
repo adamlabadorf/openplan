@@ -1,0 +1,26 @@
+acceptance_criteria:
+- Given an existing profile with ID "uuid-123" exists in the database, when a user
+  runs `pubwatch profile --profile-id "uuid-123" --description "Updated description"`,
+  then the profile's description field is updated to "Updated description" in the
+  database
+- Given an existing profile with ID "uuid-123" exists in the database, when a user
+  runs `pubwatch profile --profile-id "uuid-123" --search-terms "new search terms"`,
+  then the profile's search terms field is updated to "new search terms" in the database
+- Given an existing profile with ID "uuid-123" exists in the database, when a user
+  runs `pubwatch profile --profile-id "uuid-123" --delete`, then the profile is marked
+  as soft-deleted in the database and is not returned in subsequent listings
+- Given an existing profile with ID "uuid-123" exists in the database, when a user
+  runs `pubwatch profile --profile-id "uuid-123" --description "New description" --search-terms
+  "Different search terms"`, then both the description and search terms fields are
+  updated simultaneously in the database
+- Given an existing profile with ID "uuid-123" exists in the database, when a user
+  runs `pubwatch profile --profile-id "uuid-123" --delete` and then attempts to retrieve
+  the profile, then the retrieval returns an empty result or appropriate error message
+complexity: medium
+dependencies:
+- feature-001
+description: Allow researchers to update, delete, or modify existing topic profiles
+  with new search terms and descriptions.
+id: epic-001-feature-003
+spec_ready: true
+title: Profile Management and Updates

@@ -1,0 +1,30 @@
+acceptance_criteria:
+- Given papers exist for a profile named "COVID-19 Research", when they run pubwatch
+  list --profile "COVID-19 Research", then the system displays all papers matching
+  that profile with title, authors, and publication date
+- Given no papers exist for a profile named "New Profile", when they run pubwatch
+  list --profile "New Profile", then the system returns an empty list or appropriate
+  message
+- Given multiple papers exist for a profile named "Viral Pathogens", when they run
+  pubwatch list --profile "Viral Pathogens" --limit 5, then only 5 papers are returned
+  and displayed
+- Given a profile has papers with varying publication dates, when they run pubwatch
+  list --profile "COVID-19 Research", then the system displays papers sorted by publication
+  date in descending order
+- Given a profile has papers with different authors, when they run pubwatch list --profile
+  "Viral Pathogens", then the system correctly displays all author names for each
+  paper
+- Given an invalid profile name is provided, when they run pubwatch list --profile
+  "NonExistentProfile", then the system returns an appropriate error message
+- Given a limit parameter is provided that exceeds the number of papers in a profile,
+  when they run pubwatch list --profile "COVID-19 Research" --limit 10, then the system
+  displays all available papers without error
+complexity: low
+dependencies:
+- feature-001
+- feature-002
+description: Enable researchers to list papers fetched under a specific topic profile,
+  showing relevant metadata for each paper.
+id: epic-001-feature-004
+spec_ready: true
+title: Paper Listing by Profile

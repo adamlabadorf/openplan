@@ -1,0 +1,20 @@
+acceptance_criteria:
+- Given a researcher has defined topic profiles with at least one paper associated,
+  when the digest service runs weekly, then it generates reports with top 10 papers
+  per profile
+- Given a researcher receives a digest, when they open it, then it displays papers
+  sorted by relevance score in descending order
+- Given a publication is updated during the week, when the weekly digest is generated,
+  then the most recent version appears in the digest with an updated timestamp
+- Given the digest service encounters an error processing papers for a profile, when
+  it runs weekly, then it logs the error and continues processing other profiles
+- Given multiple researchers have defined topic profiles, when the digest service
+  runs weekly, then each researcher receives their own personalized digest report
+complexity: medium
+dependencies:
+- feature-002
+description: A background service that generates weekly ranked paper digests containing
+  the top 10 most relevant papers per topic profile for each researcher.
+id: epic-002-feature-003
+spec_ready: true
+title: Digest Generation Service

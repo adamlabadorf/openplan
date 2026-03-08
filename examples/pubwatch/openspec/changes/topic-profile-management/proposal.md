@@ -1,58 +1,31 @@
-# Topic Profile Management
+## Why
 
-## Overview
+Researchers need a way to define and manage their research topic profiles with specific search criteria for PubMed queries. This feature will allow them to create, update, view, and delete topic profiles that contain specific keywords and filters for searching publications. Currently, there's no centralized system for managing these complex search configurations, which makes it difficult for researchers to efficiently find relevant publications.
 
-A feature that allows researchers to define and maintain named topic profiles within a User Profile Service without writing code. This enables users to organize their research interests, expertise areas, and professional topics in a structured way while maintaining flexibility for updates and modifications.
+## What Changes
 
-## Problem Statement
+- Create a new topic profile management system for researchers
+- Implement functionality to save new topic profiles with unique identifiers
+- Add capability to update existing topic profiles while maintaining version history
+- Enable users to execute PubMed API searches using defined filters
+- Provide a user interface to view all saved topic profiles with metadata
+- Allow deletion of topic profiles from the database
 
-Researchers currently lack an intuitive way to define and manage their professional topics and research interests within the platform. They need a system that allows them to:
+## Capabilities
 
-- Create named topic profiles to organize their research interests
-- Maintain and update these profiles without requiring technical coding skills
-- Structure their professional areas in a flexible, meaningful way
-- Easily share or reference their topic profiles
+### New Capabilities
+- `topic-profile-creation`: System for creating new topic profiles with search criteria
+- `topic-profile-updating`: System for updating existing topic profiles while maintaining history
+- `pubmed-search-execution`: System for executing PubMed API searches using specified filters
+- `topic-profile-listing`: System for displaying all saved topic profiles with metadata
+- `topic-profile-deletion`: System for removing topic profiles from the database
 
-## Solution
+### Modified Capabilities
+- `publication-fetching`: Requirements modified to support topic profile-specific queries
 
-Implement a Topic Profile Management system that provides:
+## Impact
 
-- A user-friendly interface for defining and managing topic profiles
-- Ability to create, update, and delete topic profiles
-- Support for hierarchical topic organization
-- Integration with existing user profile service
-- No-code interface for topic creation and modification
-
-## Value Proposition
-
-- Researchers can easily organize their professional topics and interests
-- No coding required for managing topic profiles
-- Enhanced user profile completeness and accuracy
-- Better organization for research networking and collaboration
-- Improved discoverability of expertise areas
-
-## Acceptance Criteria
-
-- Users can create new topic profiles with descriptive names
-- Users can update existing topic profiles
-- Users can delete topic profiles
-- Topic profiles support hierarchical organization (parent-child relationships)
-- System integrates seamlessly with existing user profile service
-- No code changes required for profile management
-- Interface is intuitive and user-friendly
-
-## Dependencies
-
-- Existing User Profile Service API
-- Authentication and authorization system
-- Database schema for storing topic profiles
-- UI/UX design for profile management interface
-- Existing user management system
-
-## Estimated Complexity
-
-Medium - 3-5 days of development time
-
-## Spec Ready
-
-No
+- New database schema for storing topic profile information
+- Updated API endpoints for managing topic profiles
+- Enhanced PubMed fetching logic to support topic profile filters
+- Modified UI components for topic profile management

@@ -1,0 +1,22 @@
+acceptance_criteria:
+- Given a researcher has configured their email settings with a valid email address,
+  when a digest is generated and successfully sent, then the email is delivered to
+  the configured address
+- Given a researcher has configured their email settings with a valid email address,
+  when a digest attempt fails due to SMTP service unavailability, then it retries
+  using exponential backoff for up to 3 attempts
+- Given a researcher has configured their email settings with an invalid email address,
+  when delivery is attempted, then an error notification is logged with retry information
+  and the delivery is marked as failed
+- Given the email service is down for all retry attempts, when a digest attempt fails,
+  then an alert is triggered to notify system administrators of the failure
+- Given a researcher has configured their email settings, when a digest is generated
+  and sent successfully, then a success log entry is created with timestamp and recipient
+  details
+complexity: medium
+dependencies:
+- feature-003
+description: Integration with SMTP service to deliver weekly email digests to researchers.
+id: epic-003-feature-004
+spec_ready: true
+title: Email Delivery Service

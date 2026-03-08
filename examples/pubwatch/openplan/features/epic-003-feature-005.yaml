@@ -1,0 +1,18 @@
+acceptance_criteria:
+- Given a researcher has configured their preferences for HTML format, when a digest
+  is generated, then the content is formatted as HTML
+- Given a researcher has configured their preferences for plain text format, when
+  a digest is generated, then the content is formatted as plain text
+- Given a researcher wants to exclude specific papers, when they mark papers as excluded,
+  then those papers are not included in future digests
+- Given a researcher sets a maximum paper count to 5, when a digest is generated,
+  then no more than 5 papers are included in the digest
+- Given a researcher has marked papers as excluded, when a new digest is generated,
+  then excluded papers are not included in the digest content
+complexity: medium
+dependencies:
+- feature-003
+description: Allow researchers to customize digest email content and formatting.
+id: epic-003-feature-005
+spec_ready: true
+title: Digest Customization

@@ -1,0 +1,22 @@
+acceptance_criteria:
+- Given a researcher has defined a topic profile with specific keywords, when they
+  run pubwatch fetch, then new papers matching the profile are retrieved and stored
+  locally in the database within 30 seconds
+- Given a paper has been fetched and stored locally, when the researcher runs pubwatch
+  list, then the paper appears in the local database with title, authors, abstract,
+  and publication date fields populated correctly
+- Given the NCBI API returns a rate limit error (HTTP 429), when pubwatch retries
+  the request, then it uses exponential backoff and succeeds in retrieving the paper
+  within 3 attempts
+- Given a researcher has defined a topic profile with no matching papers, when they
+  run pubwatch fetch, then the system reports "No new papers found" and creates no
+  new database entries
+- Given a researcher runs pubwatch list with no papers in the local database, when
+  they check the output, then an empty list is returned with no error messages
+complexity: low
+dependencies: []
+description: A feature to fetch publications from external APIs and store them locally
+  for processing, enabling the retrieval of new papers matching researcher topic profiles.
+id: epic-002-feature-001
+spec_ready: true
+title: Publication Fetching and Storage

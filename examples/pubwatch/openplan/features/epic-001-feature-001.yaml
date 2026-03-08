@@ -1,0 +1,23 @@
+acceptance_criteria:
+- Given a researcher provides profile details, when they run pubwatch profile --name
+  "COVID-19 Research" --search-terms "covid-19 treatment", then a new profile is created
+  and stored in the local database with the provided name, search terms, and a unique
+  identifier
+- Given an existing profile exists in the local database, when they run pubwatch profile
+  --profile-id "uuid-123", then the system returns the profile details including name,
+  search terms, description, and profile ID
+- Given multiple profiles exist in the local database, when they run pubwatch profile,
+  then all active profiles are listed with their names, IDs, and descriptions
+- Given a researcher provides invalid profile details, when they run pubwatch profile
+  --name "", --search-terms "covid-19 treatment", then the system returns an error
+  message indicating that the name field is required
+- Given a researcher runs pubwatch profile with no arguments, when they run pubwatch
+  profile --name "Test Profile" --search-terms "test", then a new profile with default
+  description is created and stored in the local database
+complexity: low
+dependencies: []
+description: Enable researchers to create named topic profiles with search terms and
+  descriptions, storing them in a local database for future use.
+id: epic-001-feature-001
+spec_ready: true
+title: Profile Creation and Storage

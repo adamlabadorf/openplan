@@ -1,0 +1,26 @@
+acceptance_criteria:
+- Given a researcher has defined a topic profile with specific keywords and filters,
+  when the weekly digest generation process is triggered, then only papers matching
+  all criteria in the profile are included in the email
+- Given multiple topic profiles exist for a researcher with different keywords and
+  filters, when the digest generation process runs, then each profile produces its
+  own distinct section in the email with only papers matching that specific profile's
+  criteria
+- Given a researcher has configured their email frequency to weekly, when the digest
+  email is generated and sent, then the email contains papers published within the
+  last 7 days matching their topic profile criteria
+- Given a researcher has configured their email frequency to daily, when the digest
+  email is generated and sent, then the email contains papers published within the
+  last 24 hours matching their topic profile criteria
+- Given a researcher has configured their email frequency to bi-weekly, when the digest
+  email is generated and sent, then the email contains papers published within the
+  last 14 days matching their topic profile criteria
+complexity: medium
+dependencies:
+- feature-001
+- feature-002
+description: System to compile fetched papers into weekly email digests based on topic
+  profile selections.
+id: epic-003-feature-003
+spec_ready: true
+title: Email Digest Generation
