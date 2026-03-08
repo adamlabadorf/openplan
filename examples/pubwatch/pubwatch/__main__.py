@@ -27,6 +27,7 @@ def main():
     parser.add_argument("--description", help="Profile description")
     parser.add_argument("--search-terms", help="Search terms for the profile")
     parser.add_argument("--profile-id", help="Specific profile ID")
+    parser.add_argument("--duplicate", action="store_true", help="Duplicate a profile")
 
     args = parser.parse_args()
 
@@ -111,6 +112,15 @@ def profile_command(args):
             print(f"Created profile: {profile['name']} (ID: {profile['id']})")
         else:
             print("Failed to create profile")
+    elif args.profile_id and args.duplicate:
+        # Duplicate existing profile
+        new_profile = storage.duplicate_profile(args.profile_id, args.name)
+        if new_profile:
+            print(
+                f"Duplicated profile: {new_profile['name']} (ID: {new_profile['id']})"
+            )
+        else:
+            print("Failed to duplicate profile")
     elif args.profile_id:
         # Get specific profile
         profile = storage.get_profile(args.profile_id)

@@ -57,6 +57,20 @@ class PaperStorage:
             )
         """)
 
+        # Create profile_versions table for version tracking of profiles
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS profile_versions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                profile_id TEXT NOT NULL,
+                version_number INTEGER NOT NULL,
+                name TEXT,
+                description TEXT,
+                search_terms TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE
+            )
+        """)
+
         # Create profile_keywords table to support hierarchical topic organization
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS profile_keywords (
@@ -307,6 +321,280 @@ class PaperStorage:
         finally:
             conn.close()
 
+    def create_profile_version(self, profile_id: str):
+        """
+        Create a version record for the given profile.
+
+        Args:
+            profile_id (str): The ID of the profile to version
+
+        Returns:
+            bool: True if version created successfully, False otherwise
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        try:
+            # Get current profile data
+            cursor.execute(
+                """
+                SELECT name, description, search_terms 
+                FROM profiles 
+                WHERE id = ?
+            """,
+                (profile_id,),
+            )
+
+            row = cursor.fetchone()
+            if not row:
+                return False
+
+            name, description, search_terms = row
+
+            # Get the maximum version number for this profile
+            cursor.execute(
+                """
+                SELECT COALESCE(MAX(version_number), 0) 
+                FROM profile_versions 
+                WHERE profile_id = ?
+            """,
+                (profile_id,),
+            )
+
+            max_version = cursor.fetchone()[0]
+            version_number = max_version + 1
+
+            # Insert new version record
+            cursor.execute(
+                """
+                INSERT INTO profile_versions 
+                (profile_id, version_number, name, description, search_terms)
+                VALUES (?, ?, ?, ?, ?)
+            """,
+                (
+                    profile_id,
+                    version_number,
+                    name or "",
+                    description or "",
+                    search_terms or "",
+                ),
+            )
+
+            conn.commit()
+            return True
+
+        except sqlite3.Error as e:
+            print(f"Database error creating profile version: {e}")
+            return False
+        finally:
+            conn.close()
+
+    def duplicate_profile(self, profile_id: str, new_name: str = None):
+        """
+        Duplicate an existing profile with a new name.
+
+        Args:
+            profile_id (str): ID of the profile to duplicate
+            new_name (str, optional): New name for the duplicated profile
+
+        Returns:
+            dict: The new profile information or None if failed
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        try:
+            # Get the original profile data
+            cursor.execute(
+                """
+                SELECT id, name, description, search_terms, parent_profile_id
+                FROM profiles 
+                WHERE id = ? AND is_deleted = FALSE
+            """,
+                (profile_id,),
+            )
+
+            row = cursor.fetchone()
+            if not row:
+                return None
+
+            original_id, name, description, search_terms, parent_profile_id = row
+
+            # Generate a new unique ID for the duplicated profile
+            import uuid
+
+            new_profile_id = str(uuid.uuid4())
+
+            # If no new name specified, use the original with " (copy)" suffix
+            if new_name is None:
+                new_name = f"{name} (copy)"
+
+            # Create the new profile
+            cursor.execute(
+                """
+                INSERT INTO profiles 
+                (id, name, description, search_terms, parent_profile_id)
+                VALUES (?, ?, ?, ?, ?)
+            """,
+                (
+                    new_profile_id,
+                    new_name,
+                    description or "",
+                    search_terms or "",
+                    original_id,
+                ),
+            )
+
+            conn.commit()
+
+            # Create version record for the original profile
+            self.create_profile_version(profile_id)
+
+            return {
+                "id": new_profile_id,
+                "name": new_name,
+                "description": description or "",
+                "search_terms": search_terms or "",
+                "parent_profile_id": original_id,
+            }
+
+        except sqlite3.Error as e:
+            print(f"Database error duplicating profile: {e}")
+            return None
+        finally:
+            conn.close()
+
+    def create_profile_version(self, profile_id: str):
+        """
+        Create a version record for the given profile.
+
+        Args:
+            profile_id (str): The ID of the profile to version
+
+        Returns:
+            bool: True if version created successfully, False otherwise
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        try:
+            # Get current profile data
+            cursor.execute(
+                """
+                SELECT name, description, search_terms 
+                FROM profiles 
+                WHERE id = ?
+            """,
+                (profile_id,),
+            )
+
+            row = cursor.fetchone()
+            if not row:
+                return False
+
+            name, description, search_terms = row
+
+            # Get the maximum version number for this profile
+            cursor.execute(
+                """
+                SELECT COALESCE(MAX(version_number), 0) 
+                FROM profile_versions 
+                WHERE profile_id = ?
+            """,
+                (profile_id,),
+            )
+
+            max_version = cursor.fetchone()[0]
+            version_number = max_version + 1
+
+            # Insert new version record
+            cursor.execute(
+                """
+                INSERT INTO profile_versions 
+                (profile_id, version_number, name, description, search_terms)
+                VALUES (?, ?, ?, ?, ?)
+            """,
+                (profile_id, version_number, name, description, search_terms),
+            )
+
+            conn.commit()
+            return True
+
+        except sqlite3.Error as e:
+            print(f"Database error creating profile version: {e}")
+            return False
+        finally:
+            conn.close()
+
+    def duplicate_profile(self, profile_id: str, new_name: str = None):
+        """
+        Duplicate an existing profile with a new name.
+
+        Args:
+            profile_id (str): ID of the profile to duplicate
+            new_name (str, optional): New name for the duplicated profile
+
+        Returns:
+            dict: The new profile information or None if failed
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        try:
+            # Get the original profile data
+            cursor.execute(
+                """
+                SELECT id, name, description, search_terms, parent_profile_id
+                FROM profiles 
+                WHERE id = ? AND is_deleted = FALSE
+            """,
+                (profile_id,),
+            )
+
+            row = cursor.fetchone()
+            if not row:
+                return None
+
+            original_id, name, description, search_terms, parent_profile_id = row
+
+            # Generate a new unique ID for the duplicated profile
+            import uuid
+
+            new_profile_id = str(uuid.uuid4())
+
+            # If no new name specified, use the original with " (copy)" suffix
+            if new_name is None:
+                new_name = f"{name} (copy)"
+
+            # Create the new profile
+            cursor.execute(
+                """
+                INSERT INTO profiles 
+                (id, name, description, search_terms, parent_profile_id)
+                VALUES (?, ?, ?, ?, ?)
+            """,
+                (new_profile_id, new_name, description, search_terms, original_id),
+            )
+
+            conn.commit()
+
+            # Create version record for the original profile
+            self.create_profile_version(profile_id)
+
+            return {
+                "id": new_profile_id,
+                "name": new_name,
+                "description": description,
+                "search_terms": search_terms,
+                "parent_profile_id": original_id,
+            }
+
+        except sqlite3.Error as e:
+            print(f"Database error duplicating profile: {e}")
+            return None
+        finally:
+            conn.close()
+
     def delete_profile(self, profile_id: str):
         """
         Soft-delete a topic profile by ID.
@@ -444,6 +732,96 @@ class PaperStorage:
 
         except sqlite3.Error as e:
             print(f"Database error fetching papers: {e}")
+            return []
+        finally:
+            conn.close()
+
+    def restore_profile_version(self, profile_id: str, version_number: int):
+        """
+        Restore a specific version of a profile.
+
+        Args:
+            profile_id (str): The ID of the profile to restore
+            version_number (int): Version number to restore
+
+        Returns:
+            bool: True if restoration was successful, False otherwise
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        try:
+            # Get the version data
+            cursor.execute(
+                """
+                SELECT name, description, search_terms 
+                FROM profile_versions 
+                WHERE profile_id = ? AND version_number = ?
+            """,
+                (profile_id, version_number),
+            )
+
+            row = cursor.fetchone()
+            if not row:
+                return False
+
+            name, description, search_terms = row
+
+            # Update the profile with historical data
+            cursor.execute(
+                """
+                UPDATE profiles 
+                SET name = ?, description = ?, search_terms = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            """,
+                (name, description, search_terms, profile_id),
+            )
+
+            conn.commit()
+            return cursor.rowcount > 0
+
+        except sqlite3.Error as e:
+            print(f"Database error restoring profile version: {e}")
+            return False
+        finally:
+            conn.close()
+
+    def get_profile_versions(self, profile_id: str):
+        """
+        Retrieve version history for the given profile.
+
+        Args:
+            profile_id (str): The ID of the profile to retrieve versions for
+
+        Returns:
+            list: List of version records or empty list if none found
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                """
+                SELECT id, version_number, name, description, search_terms, created_at
+                FROM profile_versions 
+                WHERE profile_id = ?
+                ORDER BY version_number ASC
+            """,
+                (profile_id,),
+            )
+
+            columns = [description[0] for description in cursor.description]
+            rows = cursor.fetchall()
+
+            versions = []
+            for row in rows:
+                version = dict(zip(columns, row))
+                versions.append(version)
+
+            return versions
+
+        except sqlite3.Error as e:
+            print(f"Database error retrieving profile versions: {e}")
             return []
         finally:
             conn.close()

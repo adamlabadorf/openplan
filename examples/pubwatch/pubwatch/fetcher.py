@@ -115,40 +115,71 @@ class PubMedFetcher:
         raise requests.RequestException("Max retries exceeded")
 
     def _parse_paper_data(self, xml_content: str) -> List[Dict]:
-        """
-        Parse PubMed XML data into structured format.
+        """Parse PubMed XML (efetch retmode=xml) into structured dicts."""
+        import xml.etree.ElementTree as ET
 
-        Args:
-            xml_content (str): XML content from E-utilities
-
-        Returns:
-            List[Dict]: List of paper records
-        """
-        # Simplified parsing - in a real implementation this would be more robust
         papers = []
+        try:
+            root = ET.fromstring(xml_content)
+        except ET.ParseError:
+            return papers
 
-        # For demonstration, we'll create sample data
-        # In a full implementation, proper XML parsing would be used
-        sample_papers = [
-            {
-                "title": "Novel therapeutic approach to viral infections",
-                "authors": ["Smith J", "Johnson A", "Williams B"],
-                "abstract": "This study investigates new treatment approaches for viral infections...",
-                "publication_date": "2023-12-15",
-                "doi": "10.1234/ijv2023.12345",
-                "pmid": "12345678",
-            },
-            {
-                "title": "Genomic analysis of emerging pathogens",
-                "authors": ["Brown C", "Davis E"],
-                "abstract": "Genomic sequencing was performed on recently identified pathogens...",
-                "publication_date": "2023-11-30",
-                "doi": "10.1234/pmed2023.56789",
-                "pmid": "87654321",
-            },
-        ]
+        for article in root.findall(".//PubmedArticle"):
+            medline = article.find("MedlineCitation")
+            if medline is None:
+                continue
 
-        return sample_papers
+            pmid_el = medline.find("PMID")
+            pmid = pmid_el.text if pmid_el is not None else ""
+
+            art = medline.find("Article")
+            if art is None:
+                continue
+
+            # Title
+            title_el = art.find("ArticleTitle")
+            title = "".join(title_el.itertext()) if title_el is not None else ""
+
+            # Abstract
+            abstract_el = art.find("Abstract/AbstractText")
+            abstract = "".join(abstract_el.itertext()) if abstract_el is not None else ""
+
+            # Authors
+            authors = []
+            for author in art.findall("AuthorList/Author"):
+                last = author.findtext("LastName", "")
+                fore = author.findtext("ForeName", "")
+                initials = author.findtext("Initials", "")
+                name = f"{last} {initials}" if initials else f"{last} {fore}"
+                if name.strip():
+                    authors.append(name.strip())
+
+            # Publication date
+            pub_date = art.find("Journal/JournalIssue/PubDate")
+            if pub_date is not None:
+                year = pub_date.findtext("Year", "")
+                month = pub_date.findtext("Month", "")
+                day = pub_date.findtext("Day", "")
+                pub_date_str = "-".join(p for p in [year, month, day] if p)
+            else:
+                pub_date_str = ""
+
+            # DOI
+            doi = ""
+            for id_el in article.findall(".//ArticleId"):
+                if id_el.get("IdType") == "doi":
+                    doi = id_el.text or ""
+
+            papers.append({
+                "pmid": pmid,
+                "title": title,
+                "authors": authors,
+                "abstract": abstract,
+                "publication_date": pub_date_str,
+                "doi": doi,
+            })
+
+        return papers
 
 
 def main():
