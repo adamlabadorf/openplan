@@ -28,6 +28,7 @@ def main():
     parser.add_argument("--search-terms", help="Search terms for the profile")
     parser.add_argument("--profile-id", help="Specific profile ID")
     parser.add_argument("--duplicate", action="store_true", help="Duplicate a profile")
+    parser.add_argument("--restore", type=int, help="Restore a specific version number")
 
     args = parser.parse_args()
 
@@ -121,6 +122,15 @@ def profile_command(args):
             )
         else:
             print("Failed to duplicate profile")
+    elif args.profile_id and args.restore:
+        # Restore a specific version
+        success = storage.restore_profile_version(args.profile_id, args.restore)
+        if success:
+            print(f"Restored profile {args.profile_id} to version {args.restore}")
+        else:
+            print(
+                f"Failed to restore profile {args.profile_id} to version {args.restore}"
+            )
     elif args.profile_id:
         # Get specific profile
         profile = storage.get_profile(args.profile_id)

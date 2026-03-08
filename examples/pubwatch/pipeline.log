@@ -107,3 +107,14 @@ Implementing: epic-001-feature-003 — Profile Management and Updates
 [08:15:14] 
 Implementing: epic-001-feature-004 — Paper Listing by Profile
 [08:17:07]   ff done: end_turn
+[08:25:01]   apply done: end_turn
+[08:25:01]   preview: I'll implement tasks from the OpenSpec change. First, let me check what changes are available to select from.I need to select which change to work on from the list of available changes. Based on your 
+[08:25:04] 
+Implementing: epic-002-feature-001 — Publication Fetching and Storage
+[08:28:03]   ff done: end_turn
+[08:30:40]   apply done: end_turn
+[08:30:40]   preview: I can see there are several OpenSpec changes available. Based on your input mentioning "epic-002-feature-001", I'll check if this specific change exists and can be used for implementation.
+
+Let me ver
+[08:30:43] 
+Implementing: epic-002-feature-002 — Publication Scoring Engine
