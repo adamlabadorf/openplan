@@ -48,20 +48,33 @@ def fetch_command(args):
     fetcher = PubMedFetcher()
     storage = PaperStorage()
 
-    # In a real implementation, we would load the actual search terms from a profile
+    # Get search terms - either from command line or from stored profile
     if args.query:
         search_terms = args.query
     else:
-        # Default query for demonstration purposes
-        search_terms = (
-            "covid-19 treatment"
-            if args.profile == "covid-19 research"
-            else "viral pathogen"
-        )
+        # Try to get search terms from the stored profile
+        try:
+            profile = storage.get_profile(args.profile)
+            if profile and profile.get("search_terms"):
+                search_terms = profile["search_terms"]
+            else:
+                # Default query for demonstration purposes
+                search_terms = (
+                    "covid-19 treatment"
+                    if args.profile == "covid-19 research"
+                    else "viral pathogen"
+                )
+        except Exception:
+            # Default fallback
+            search_terms = (
+                "covid-19 treatment"
+                if args.profile == "covid-19 research"
+                else "viral pathogen"
+            )
 
     print(f"Searching with terms: {search_terms}")
 
-    # Fetch papers (in this demo, we'll just show mock data)
+    # Fetch papers from PubMed API
     papers = fetcher.search_papers(search_terms, max_results=args.limit)
 
     if papers:
@@ -69,7 +82,7 @@ def fetch_command(args):
         for paper in papers:
             print(f"  - {paper['title']}")
 
-        # Store papers
+        # Store papers with profile association
         for paper in papers:
             storage.save_paper(paper, args.profile or "default")
 

@@ -118,3 +118,13 @@ Implementing: epic-002-feature-001 — Publication Fetching and Storage
 Let me ver
 [08:30:43] 
 Implementing: epic-002-feature-002 — Publication Scoring Engine
+[08:32:15]   ff done: end_turn
+[08:37:32]   apply done: end_turn
+[08:37:32]   preview: I need to check the status of the specific change mentioned in your command to understand its schema and tasks. Let me do that for you.I see that the change "epic-002-feature-002" is in a blocked stat
+[08:37:35] 
+Implementing: epic-002-feature-003 — Digest Generation Service
+[08:40:01]   ff done: end_turn
+[08:40:43]   apply done: end_turn
+[08:40:43]   preview: Let me check the available changes in this workspace to determine which one to work on.Based on the conversation context and the available changes, I'll work on the "epic-002-feature-003-digest-genera
+[08:40:46] 
+Implementing: epic-002-feature-004 — Digest Delivery and Notification System
