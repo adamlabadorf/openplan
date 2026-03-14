@@ -1,5 +1,10 @@
 # Spec: Epic Dependency Schema
 
+## ADDED
+- `depends_on: list[str]` field on `Epic` (defaults to `[]`)
+- `Roadmap` model validator for unknown `depends_on` references
+- `Roadmap` model validator for cycle detection in `depends_on` graph
+
 ## Requirements
 
 ### R1 — `depends_on` field

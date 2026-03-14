@@ -1,5 +1,10 @@
 # Spec: Epic Ordering
 
+## ADDED
+- `openplan/core/ordering.py` with `resolve_epic_order(epics: list[Epic]) -> list[Epic]`
+- Kahn's algorithm (BFS/FIFO) for stable topological ordering
+- Cycle detection raising `ValueError` in `resolve_epic_order`
+
 ## Requirements
 
 ### R1 — `resolve_epic_order` function

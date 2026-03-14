@@ -1,5 +1,12 @@
 # Spec: Pipeline Test Gate
 
+## ADDED
+- `--skip-tests` flag on `run_pipeline.py`
+- Epic status tracking (`not_started` / `in_progress` / `passing` / `failed` / `blocked`)
+- Pytest gate after each epic's features are implemented
+- Blocked-dependency propagation on test failure
+- Epic status column in pipeline summary output and `pipeline_result.md`
+
 ## Requirements
 
 ### R1 — Test gate after epic implementation
