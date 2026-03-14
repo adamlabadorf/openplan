@@ -458,5 +458,55 @@ def status(
         console.print("\n[green]No locked artifacts[/green]")
 
 
+@app.command()
+def implement(
+    project_dir: Path = typer.Option(Path("."), "--project-dir", help="Project root directory"),
+    openspec_dir: Optional[Path] = typer.Option(None, "--openspec-dir", help="OpenSpec directory"),
+    model: Optional[str] = typer.Option(None, "--model", help="Model for ACP sessions"),
+    skip_tests: bool = typer.Option(False, "--skip-tests", help="Skip pytest gate between epics"),
+    from_epic: Optional[str] = typer.Option(None, "--from-epic", help="Start from this epic ID"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Print plan without executing"),
+) -> None:
+    """Run the implementation pipeline for a planned OpenPlan project."""
+    from rich.console import Console
+    from openplan.core.pipeline import ImplementationPipeline, PipelineError
+
+    # load roadmap
+    roadmap_files = list((project_dir / "openplan" / "roadmaps").glob("*.yaml"))
+    if not roadmap_files:
+        typer.echo("No roadmap found in openplan/roadmaps/", err=True)
+        raise typer.Exit(1)
+    import yaml
+    from openplan.core.schemas import Roadmap
+    with open(roadmap_files[0]) as f:
+        roadmap = Roadmap(**yaml.safe_load(f))
+
+    pipeline = ImplementationPipeline(
+        project_dir=project_dir,
+        openspec_dir=openspec_dir,
+        model=model,
+        skip_tests=skip_tests,
+        from_epic=from_epic,
+    )
+
+    if dry_run:
+        pipeline.dry_run(roadmap)
+        raise typer.Exit(0)
+
+    rich_console = Console()
+    try:
+        result = pipeline.run(roadmap)
+        rich_console.print(
+            f"[bold green]✓ Implementation complete:[/bold green] "
+            f"{result.features_implemented}/{result.features_total} features"
+        )
+        for epic_id, status in result.epic_statuses.items():
+            colour = "green" if status == "passing" else "yellow" if status == "skipped" else "red"
+            rich_console.print(f"  [{colour}]{epic_id}: {status.value}[/{colour}]")
+    except PipelineError as e:
+        rich_console.print(f"[bold red]✗ Pipeline failed:[/bold red] {e}")
+        raise typer.Exit(1)
+
+
 if __name__ == "__main__":
     app()

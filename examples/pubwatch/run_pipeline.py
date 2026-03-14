@@ -165,69 +165,25 @@ log(f"\nExported {len(exported)} features")
 # ── Phase 4: Implement via OpenCode ──────────────────────────────────────────
 section("PHASE 4: IMPLEMENTATION VIA OPENCODE")
 
-impl_results: list[dict] = []
+from openplan.core.pipeline import ImplementationPipeline, PipelineError
 
-for feature in exported:
-    change_id = feature.id
-    log(f"\nImplementing: {change_id} — {feature.title}")
-    try:
-        with ACPClient(cwd=str(PUBWATCH_DIR), permission="allow", agent="build") as client:
-            client.initialize()
-            client.new_session()
-            chunks = []
-            def on_update(t, u):
-                if t == "agent_message_chunk":
-                    txt = u.get("content", {}).get("text", "")
-                    if txt:
-                        chunks.append(txt)
-            # Fast-forward spec then apply
-            ff_prompt = f"/opsx-ff {change_id}\n\n{feature.title}\n\nGoal: {feature.description}\n\nAcceptance criteria:\n" + "\n".join(f"- {c}" for c in feature.acceptance_criteria)
-            ff_result = client.prompt(ff_prompt, on_update=on_update)
-            log(f"  ff done: {ff_result['stop_reason']}")
-
-            client.new_session()
-            chunks2 = []
-            def on_update2(t, u):
-                if t == "agent_message_chunk":
-                    txt = u.get("content", {}).get("text", "")
-                    if txt:
-                        chunks2.append(txt)
-            apply_result = client.prompt(f"/opsx-apply {change_id}", on_update=on_update2)
-            log(f"  apply done: {apply_result['stop_reason']}")
-            log(f"  preview: {''.join(chunks2)[:200]}")
-            impl_results.append({"feature": change_id, "status": "done"})
-    except Exception as e:
-        log(f"  ERROR: {e}")
-        impl_results.append({"feature": change_id, "status": f"failed: {e}"})
-        traceback.print_exc(file=LOG)
-
-    time.sleep(3)
-
-    # ── Pytest gate (after each epic's features are implemented) ──────────────
-    if not args.skip_tests:
-        log(f"  Running pytest gate for epic {feature.id}...")
-        test_result = subprocess.run(
-            ["python", "-m", "pytest"],
-            cwd=str(PUBWATCH_DIR),
-            capture_output=True,
-            text=True,
-        )
-        if test_result.returncode not in (0, 5):
-            log(f"  PYTEST FAILED (exit {test_result.returncode}):")
-            log(test_result.stderr[-2000:] if test_result.stderr else "(no stderr)")
-            impl_results[-1]["status"] = f"pytest_failed (exit {test_result.returncode})"
-            # Mark dependents blocked
-            for epic in ordered_epics:
-                if any(dep == feature.id for dep in epic.depends_on):
-                    epic_status[epic.id] = "blocked"
-            log("  Halting pipeline due to test failure.")
-            break
+pipeline = ImplementationPipeline(
+    project_dir=str(PUBWATCH_DIR),
+    skip_tests=args.skip_tests,
+)
+try:
+    result = pipeline.run(roadmap)
+    log(f"Pipeline complete: {result.features_implemented}/{result.features_total} features implemented")
+    for epic_id, status in result.epic_statuses.items():
+        log(f"  {epic_id}: {status.value}")
+except PipelineError as e:
+    log(f"Pipeline failed: {e}")
+    sys.exit(1)
 
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 section("PIPELINE COMPLETE")
 
-done_count = len([r for r in impl_results if r["status"] == "done"])
 summary = f"""# OpenPlan Pubwatch Pipeline — Results
 
 **Roadmap:** {roadmap.id} — {roadmap.title}
@@ -235,16 +191,14 @@ summary = f"""# OpenPlan Pubwatch Pipeline — Results
 **Features generated:** {len(all_features)}
 **Features stabilized:** {len(stabilized)}
 **Features exported to OpenSpec:** {len(exported)}
-**Features implemented:** {done_count}
+**Features implemented:** {result.features_implemented}/{result.features_total}
 
 ## Epic Status
 """ + "\n".join(
-    f"- **{eid}**: {status}" for eid, status in epic_status.items()
+    f"- **{eid}**: {status.value}" for eid, status in result.epic_statuses.items()
 ) + "\n\n## Epic Breakdown\n" + "\n".join(
     f"- **{r['epic']}** ({r['status']}): {', '.join(r.get('features', []))}"
     for r in RESULT
-) + "\n\n## Implementation Results\n" + "\n".join(
-    f"- **{r['feature']}**: {r['status']}" for r in impl_results
 )
 
 with open(PUBWATCH_DIR / "pipeline_result.md", "w") as f:
