@@ -11,7 +11,7 @@ Runs autonomously:
 Writes a log to pipeline.log and a summary to pipeline_result.md.
 """
 
-import sys, os, json, time, traceback, yaml, shutil
+import sys, os, json, time, traceback, yaml, shutil, subprocess, argparse
 from pathlib import Path
 
 PUBWATCH_DIR = Path(__file__).parent
@@ -21,9 +21,20 @@ sys.path.insert(0, os.path.expanduser("~/.openclaw/workspace/skills/opencode/too
 
 from openplan.core.engine import PlanningEngine, PlanningError
 from openplan.core.schemas import Epic, Feature, Roadmap
+from openplan.core.ordering import resolve_epic_order
 from openplan.core.stabilizer import FeatureStabilizer
 from openplan.integrations.openspec import export_feature, ExportError
 from acp_client import ACPClient
+
+# ── Argument Parsing ─────────────────────────────────────────────────────────
+parser = argparse.ArgumentParser(description="OpenPlan pubwatch pipeline")
+parser.add_argument(
+    "--skip-tests",
+    action="store_true",
+    default=False,
+    help="Skip pytest gate after each epic implementation",
+)
+args = parser.parse_args()
 
 LOG = open(PUBWATCH_DIR / "pipeline.log", "w", buffering=1)
 RESULT = []
@@ -73,22 +84,39 @@ roadmap = Roadmap(**roadmap_data)
 log(f"Loaded roadmap: {roadmap.id} — {roadmap.title}")
 log(f"Epics: {[e.id for e in roadmap.epics]}")
 
+# Apply dependency ordering before processing
+ordered_epics = resolve_epic_order(roadmap.epics)
+log(f"Epic order (after dependency resolution): {[e.id for e in ordered_epics]}")
+
+# Track epic status
+epic_status: dict[str, str] = {e.id: "not_started" for e in ordered_epics}
+
 
 # ── Phase 1: Decompose Epics ──────────────────────────────────────────────────
 section("PHASE 1: EPIC DECOMPOSITION")
 
 all_features: list[Feature] = []
 
-for epic in roadmap.epics:
+for epic in ordered_epics:
+    # Skip epics whose dependencies are blocked
+    blocked_deps = [dep for dep in epic.depends_on if epic_status.get(dep) == "blocked"]
+    if blocked_deps:
+        log(f"SKIP {epic.id} — blocked by: {blocked_deps}")
+        epic_status[epic.id] = "blocked"
+        RESULT.append({"epic": epic.id, "status": "blocked", "features": []})
+        continue
+
     log(f"Decomposing: {epic.id} — {epic.title}")
     try:
         features = engine.decompose_epic(epic)
         log(f"  → {len(features)} features: {[f.id for f in features]}")
         all_features.extend(features)
+        epic_status[epic.id] = "decomposed"
         RESULT.append({"epic": epic.id, "features": [f.id for f in features], "status": "decomposed"})
     except Exception as e:
         log(f"  ERROR: {e}")
-        RESULT.append({"epic": epic.id, "status": f"decompose_failed: {e}"})
+        epic_status[epic.id] = "decompose_failed"
+        RESULT.append({"epic": epic.id, "status": f"decompose_failed: {e}", "features": []})
         traceback.print_exc(file=LOG)
 
 log(f"\nTotal features: {len(all_features)}")
@@ -175,6 +203,26 @@ for feature in exported:
 
     time.sleep(3)
 
+    # ── Pytest gate (after each epic's features are implemented) ──────────────
+    if not args.skip_tests:
+        log(f"  Running pytest gate for epic {feature.id}...")
+        test_result = subprocess.run(
+            ["python", "-m", "pytest"],
+            cwd=str(PUBWATCH_DIR),
+            capture_output=True,
+            text=True,
+        )
+        if test_result.returncode not in (0, 5):
+            log(f"  PYTEST FAILED (exit {test_result.returncode}):")
+            log(test_result.stderr[-2000:] if test_result.stderr else "(no stderr)")
+            impl_results[-1]["status"] = f"pytest_failed (exit {test_result.returncode})"
+            # Mark dependents blocked
+            for epic in ordered_epics:
+                if any(dep == feature.id for dep in epic.depends_on):
+                    epic_status[epic.id] = "blocked"
+            log("  Halting pipeline due to test failure.")
+            break
+
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 section("PIPELINE COMPLETE")
@@ -189,8 +237,10 @@ summary = f"""# OpenPlan Pubwatch Pipeline — Results
 **Features exported to OpenSpec:** {len(exported)}
 **Features implemented:** {done_count}
 
-## Epic Breakdown
+## Epic Status
 """ + "\n".join(
+    f"- **{eid}**: {status}" for eid, status in epic_status.items()
+) + "\n\n## Epic Breakdown\n" + "\n".join(
     f"- **{r['epic']}** ({r['status']}): {', '.join(r.get('features', []))}"
     for r in RESULT
 ) + "\n\n## Implementation Results\n" + "\n".join(

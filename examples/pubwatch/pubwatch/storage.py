@@ -95,8 +95,521 @@ class PaperStorage:
             )
         """)
 
+        # Create notification_preferences table for digest delivery preferences
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS notification_preferences (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT NOT NULL UNIQUE,
+                email_address TEXT,
+                preferred_format TEXT DEFAULT 'html',
+                digest_frequency TEXT DEFAULT 'weekly',
+                included_profile_ids TEXT,
+                excluded_profile_ids TEXT,
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # Create digest_deliveries table to track delivery history
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS digest_deliveries (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                profile_id TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                delivery_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status TEXT DEFAULT 'pending',
+                format TEXT,
+                subject TEXT,
+                content TEXT,
+                recipients TEXT,
+                error_message TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # Create paper_exclusions table to track papers excluded from digests
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS paper_exclusions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                profile_id TEXT NOT NULL,
+                pmid TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                excluded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                reason TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
         conn.commit()
         conn.close()
+
+    def get_user_preferences(self, user_id: str) -> Optional[Dict]:
+        """Get user notification preferences."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT id, user_id, email_address, preferred_format, digest_frequency,
+                   included_profile_ids, excluded_profile_ids, is_active,
+                   created_at, updated_at 
+            FROM notification_preferences 
+            WHERE user_id = ?
+        """,
+            (user_id,),
+        )
+
+        row = cursor.fetchone()
+        conn.close()
+
+        if row:
+            return {
+                "id": row[0],
+                "user_id": row[1],
+                "email_address": row[2],
+                "preferred_format": row[3],
+                "digest_frequency": row[4],
+                "included_profile_ids": row[5],
+                "excluded_profile_ids": row[6],
+                "is_active": bool(row[7]),
+                "created_at": row[8],
+                "updated_at": row[9],
+            }
+        return None
+
+    def update_user_preferences(
+        self, user_id: str, preferences: Dict
+    ) -> Optional[Dict]:
+        """Update user notification preferences."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        # First check if preferences exist for this user
+        existing = self.get_user_preferences(user_id)
+
+        if existing:
+            # Update existing preferences
+            cursor.execute(
+                """
+                UPDATE notification_preferences 
+                SET email_address = ?, preferred_format = ?, digest_frequency = ?,
+                    included_profile_ids = ?, excluded_profile_ids = ?, is_active = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE user_id = ?
+            """,
+                (
+                    preferences.get("email_address"),
+                    preferences.get("preferred_format"),
+                    preferences.get("digest_frequency"),
+                    preferences.get("included_profile_ids"),
+                    preferences.get("excluded_profile_ids"),
+                    preferences.get("is_active", True),
+                    user_id,
+                ),
+            )
+        else:
+            # Insert new preferences
+            cursor.execute(
+                """
+                INSERT INTO notification_preferences 
+                (user_id, email_address, preferred_format, digest_frequency,
+                 included_profile_ids, excluded_profile_ids, is_active)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+                (
+                    user_id,
+                    preferences.get("email_address"),
+                    preferences.get("preferred_format"),
+                    preferences.get("digest_frequency"),
+                    preferences.get("included_profile_ids"),
+                    preferences.get("excluded_profile_ids"),
+                    preferences.get("is_active", True),
+                ),
+            )
+
+        conn.commit()
+        conn.close()
+
+        # Return the updated/created preferences
+        return self.get_user_preferences(user_id)
+
+    def get_digest_deliveries(
+        self,
+        profile_id: str = None,
+        user_id: str = None,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> List[Dict]:
+        """Get digest delivery history."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        if profile_id and user_id:
+            cursor.execute(
+                """
+                SELECT id, profile_id, user_id, delivery_date, status, format,
+                       subject, content, recipients, error_message, created_at, updated_at
+                FROM digest_deliveries 
+                WHERE profile_id = ? AND user_id = ?
+                ORDER BY delivery_date DESC
+                LIMIT ? OFFSET ?
+            """,
+                (profile_id, user_id, limit, offset),
+            )
+        elif profile_id:
+            cursor.execute(
+                """
+                SELECT id, profile_id, user_id, delivery_date, status, format,
+                       subject, content, recipients, error_message, created_at, updated_at
+                FROM digest_deliveries 
+                WHERE profile_id = ?
+                ORDER BY delivery_date DESC
+                LIMIT ? OFFSET ?
+            """,
+                (profile_id, limit, offset),
+            )
+        elif user_id:
+            cursor.execute(
+                """
+                SELECT id, profile_id, user_id, delivery_date, status, format,
+                       subject, content, recipients, error_message, created_at, updated_at
+                FROM digest_deliveries 
+                WHERE user_id = ?
+                ORDER BY delivery_date DESC
+                LIMIT ? OFFSET ?
+            """,
+                (user_id, limit, offset),
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT id, profile_id, user_id, delivery_date, status, format,
+                       subject, content, recipients, error_message, created_at, updated_at
+                FROM digest_deliveries 
+                ORDER BY delivery_date DESC
+                LIMIT ? OFFSET ?
+            """,
+                (limit, offset),
+            )
+
+        rows = cursor.fetchall()
+        conn.close()
+
+        deliveries = []
+        for row in rows:
+            deliveries.append(
+                {
+                    "id": row[0],
+                    "profile_id": row[1],
+                    "user_id": row[2],
+                    "delivery_date": row[3],
+                    "status": row[4],
+                    "format": row[5],
+                    "subject": row[6],
+                    "content": row[7],
+                    "recipients": row[8],
+                    "error_message": row[9],
+                    "created_at": row[10],
+                    "updated_at": row[11],
+                }
+            )
+
+        return deliveries
+
+    def get_top_papers(
+        self,
+        profile_ids: List[str],
+        limit: int = 10,
+        start_date: str = None,
+        end_date: str = None,
+        include_excluded: bool = False,
+    ) -> List[Dict]:
+        """Retrieve top papers for specified profiles."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        # Start building the query
+        query = """
+            SELECT p.id, p.pmid, p.title, p.authors, p.abstract, p.publication_date, p.doi, 
+                   p.profile_id, p.fetched_at
+            FROM papers p
+            WHERE p.profile_id IN ({})
+        """.format(",".join("?" * len(profile_ids)))
+
+        params = profile_ids
+
+        # Add date filters if provided
+        if start_date:
+            query += " AND p.publication_date >= ?"
+            params.append(start_date)
+
+        if end_date:
+            query += " AND p.publication_date <= ?"
+            params.append(end_date)
+
+        # Order by publication date (most recent first) and limit results
+        query += " ORDER BY p.publication_date DESC LIMIT ?"
+        params.append(limit)
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        conn.close()
+
+        papers = []
+        for row in rows:
+            papers.append(
+                {
+                    "id": row[0],
+                    "pmid": row[1],
+                    "title": row[2],
+                    "authors": row[3],
+                    "abstract": row[4],
+                    "publication_date": row[5],
+                    "doi": row[6],
+                    "profile_id": row[7],
+                    "fetched_at": row[8],
+                }
+            )
+
+        return papers
+
+    def create_digest_delivery(self, delivery_data: Dict) -> Dict:
+        """Create a new digest delivery record."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            INSERT INTO digest_deliveries 
+            (profile_id, user_id, delivery_date, status, format,
+             subject, content, recipients, error_message)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+            (
+                delivery_data.get("profile_id"),
+                delivery_data.get("user_id"),
+                delivery_data.get("delivery_date"),
+                delivery_data.get("status", "pending"),
+                delivery_data.get("format"),
+                delivery_data.get("subject"),
+                delivery_data.get("content"),
+                delivery_data.get("recipients"),
+                delivery_data.get("error_message"),
+            ),
+        )
+
+        delivery_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+
+        # Return the created delivery record
+        return self.get_digest_delivery(delivery_id)
+
+    def get_digest_delivery(self, delivery_id: int) -> Optional[Dict]:
+        """Get a specific digest delivery by ID."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT id, profile_id, user_id, delivery_date, status, format,
+                   subject, content, recipients, error_message, created_at, updated_at
+            FROM digest_deliveries 
+            WHERE id = ?
+        """,
+            (delivery_id,),
+        )
+
+        row = cursor.fetchone()
+        conn.close()
+
+        if row:
+            return {
+                "id": row[0],
+                "profile_id": row[1],
+                "user_id": row[2],
+                "delivery_date": row[3],
+                "status": row[4],
+                "format": row[5],
+                "subject": row[6],
+                "content": row[7],
+                "recipients": row[8],
+                "error_message": row[9],
+                "created_at": row[10],
+                "updated_at": row[11],
+            }
+        return None
+
+    def get_excluded_papers(
+        self,
+        profile_id: str = None,
+        user_id: str = None,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> List[Dict]:
+        """Get excluded papers by profile or user."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        if profile_id and user_id:
+            cursor.execute(
+                """
+                SELECT id, profile_id, pmid, user_id, excluded_at, reason, created_at
+                FROM paper_exclusions 
+                WHERE profile_id = ? AND user_id = ?
+                ORDER BY excluded_at DESC
+                LIMIT ? OFFSET ?
+            """,
+                (profile_id, user_id, limit, offset),
+            )
+        elif profile_id:
+            cursor.execute(
+                """
+                SELECT id, profile_id, pmid, user_id, excluded_at, reason, created_at
+                FROM paper_exclusions 
+                WHERE profile_id = ?
+                ORDER BY excluded_at DESC
+                LIMIT ? OFFSET ?
+            """,
+                (profile_id, limit, offset),
+            )
+        elif user_id:
+            cursor.execute(
+                """
+                SELECT id, profile_id, pmid, user_id, excluded_at, reason, created_at
+                FROM paper_exclusions 
+                WHERE user_id = ?
+                ORDER BY excluded_at DESC
+                LIMIT ? OFFSET ?
+            """,
+                (user_id, limit, offset),
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT id, profile_id, pmid, user_id, excluded_at, reason, created_at
+                FROM paper_exclusions 
+                ORDER BY excluded_at DESC
+                LIMIT ? OFFSET ?
+            """,
+                (limit, offset),
+            )
+
+        rows = cursor.fetchall()
+        conn.close()
+
+        exclusions = []
+        for row in rows:
+            exclusions.append(
+                {
+                    "id": row[0],
+                    "profile_id": row[1],
+                    "pmid": row[2],
+                    "user_id": row[3],
+                    "excluded_at": row[4],
+                    "reason": row[5],
+                    "created_at": row[6],
+                }
+            )
+
+        return exclusions
+
+    def mark_paper_excluded(
+        self, pmid: str, profile_id: str, user_id: str, reason: str = None
+    ) -> Dict:
+        """Mark a paper as excluded from notifications."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        # Check if exclusion already exists
+        cursor.execute(
+            """
+            SELECT id FROM paper_exclusions 
+            WHERE profile_id = ? AND pmid = ? AND user_id = ?
+        """,
+            (profile_id, pmid, user_id),
+        )
+
+        existing = cursor.fetchone()
+
+        if not existing:
+            cursor.execute(
+                """
+                INSERT INTO paper_exclusions (profile_id, pmid, user_id, reason)
+                VALUES (?, ?, ?, ?)
+            """,
+                (profile_id, pmid, user_id, reason),
+            )
+
+            exclusion_id = cursor.lastrowid
+        else:
+            # Update existing exclusion
+            cursor.execute(
+                """
+                UPDATE paper_exclusions 
+                SET reason = ? 
+                WHERE id = ?
+            """,
+                (reason, existing[0]),
+            )
+
+            exclusion_id = existing[0]
+
+        conn.commit()
+        conn.close()
+
+        # Return the created/updated exclusion record
+        return self.get_paper_exclusion(exclusion_id)
+
+    def get_paper_exclusion(self, exclusion_id: int) -> Optional[Dict]:
+        """Get a specific paper exclusion by ID."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT id, profile_id, pmid, user_id, excluded_at, reason, created_at
+            FROM paper_exclusions 
+            WHERE id = ?
+        """,
+            (exclusion_id,),
+        )
+
+        row = cursor.fetchone()
+        conn.close()
+
+        if row:
+            return {
+                "id": row[0],
+                "profile_id": row[1],
+                "pmid": row[2],
+                "user_id": row[3],
+                "excluded_at": row[4],
+                "reason": row[5],
+                "created_at": row[6],
+            }
+        return None
+
+    def remove_paper_exclusion(self, pmid: str, profile_id: str, user_id: str) -> bool:
+        """Remove a paper exclusion."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            DELETE FROM paper_exclusions 
+            WHERE profile_id = ? AND pmid = ? AND user_id = ?
+        """,
+            (profile_id, pmid, user_id),
+        )
+
+        deleted = cursor.rowcount > 0
+        conn.commit()
+        conn.close()
+
+        return deleted
 
     def save_paper(self, paper: Dict, profile_id: str):
         """

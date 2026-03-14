@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 VAGUE_PHRASES = [
@@ -73,6 +73,7 @@ class Epic(BaseModel):
     success_metrics: list[SuccessMetric]
     architectural_impact: list[ArchitecturalImpact]
     features: list[FeatureRef] = Field(default_factory=list)
+    depends_on: list[str] = Field(default_factory=list)
 
     @field_validator("success_metrics")
     @classmethod
@@ -183,6 +184,40 @@ class Roadmap(BaseModel):
         if len(v) > 8:
             raise ValueError("Roadmap cannot have more than 8 epics")
         return v
+
+    @model_validator(mode='after')
+    def validate_epic_dependencies(self) -> 'Roadmap':
+        """Validate depends_on references and detect cycles."""
+        epic_ids = {e.id for e in self.epics}
+
+        # Check all depends_on IDs reference known epics
+        for epic in self.epics:
+            for dep_id in epic.depends_on:
+                if dep_id not in epic_ids:
+                    raise ValueError(
+                        f"Epic '{epic.id}' depends_on unknown epic '{dep_id}'"
+                    )
+
+        # Detect cycles using DFS colour map (white=0, grey=1, black=2)
+        colour = {e.id: 0 for e in self.epics}
+        adj = {e.id: list(e.depends_on) for e in self.epics}
+
+        def dfs(node: str, path: list) -> None:
+            colour[node] = 1  # grey — in progress
+            for neighbour in adj[node]:
+                if colour[neighbour] == 1:
+                    raise ValueError(
+                        f"Cycle detected in epic dependencies: '{node}' -> '{neighbour}'"
+                    )
+                if colour[neighbour] == 0:
+                    dfs(neighbour, path + [neighbour])
+            colour[node] = 2  # black — done
+
+        for epic in self.epics:
+            if colour[epic.id] == 0:
+                dfs(epic.id, [epic.id])
+
+        return self
 
 
 class PlanState(BaseModel):

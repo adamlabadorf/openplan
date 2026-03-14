@@ -266,3 +266,67 @@ class TestRoadmapValidators:
             ],
         )
         assert roadmap.id == "test-roadmap"
+
+
+def _make_epic(epic_id: str, depends_on: list[str] | None = None) -> Epic:
+    """Helper to construct a minimal valid Epic."""
+    from openplan.core.schemas import ArchitecturalImpact
+    return Epic(
+        id=epic_id,
+        title=f"Epic {epic_id}",
+        outcome="some outcome",
+        success_metrics=[SuccessMetric(name="m", target="t", unit="u")],
+        architectural_impact=[
+            ArchitecturalImpact(component="c", change_type="add", description="d")
+        ],
+        depends_on=depends_on or [],
+    )
+
+
+def test_epic_depends_on_defaults_empty():
+    """Epic with no depends_on has depends_on == []."""
+    epic = _make_epic("epic-1")
+    assert epic.depends_on == []
+
+
+def test_roadmap_valid_depends_on():
+    """Roadmap with valid depends_on constructs without error."""
+    roadmap = Roadmap(
+        id="rm-1",
+        title="Roadmap",
+        vision_id="v-1",
+        epics=[
+            _make_epic("epic-1"),
+            _make_epic("epic-2", depends_on=["epic-1"]),
+        ],
+    )
+    assert roadmap.id == "rm-1"
+
+
+def test_roadmap_unknown_depends_on_raises():
+    """Unknown depends_on ID raises ValidationError."""
+    with pytest.raises(ValidationError) as exc_info:
+        Roadmap(
+            id="rm-1",
+            title="Roadmap",
+            vision_id="v-1",
+            epics=[
+                _make_epic("epic-1", depends_on=["nonexistent-epic"]),
+            ],
+        )
+    assert "unknown epic" in str(exc_info.value).lower() or "nonexistent-epic" in str(exc_info.value)
+
+
+def test_roadmap_cycle_depends_on_raises():
+    """Cycle in depends_on raises ValidationError."""
+    with pytest.raises(ValidationError) as exc_info:
+        Roadmap(
+            id="rm-1",
+            title="Roadmap",
+            vision_id="v-1",
+            epics=[
+                _make_epic("epic-1", depends_on=["epic-2"]),
+                _make_epic("epic-2", depends_on=["epic-1"]),
+            ],
+        )
+    assert "cycle" in str(exc_info.value).lower()

@@ -329,6 +329,41 @@ def test_status_command(project_dir):
     assert "ADRs:" in result.stdout
 
 
+def test_epic_ordering_with_dependencies(project_dir):
+    """Roadmap with depends_on: resolve_epic_order returns correct order."""
+    from openplan.core.ordering import resolve_epic_order
+    from openplan.core.schemas import ArchitecturalImpact, Epic, Roadmap, SuccessMetric
+
+    def make_epic(epic_id, depends_on=None):
+        return Epic(
+            id=epic_id,
+            title=f"Epic {epic_id}",
+            outcome="some outcome",
+            success_metrics=[SuccessMetric(name="m", target="t", unit="u")],
+            architectural_impact=[
+                ArchitecturalImpact(component="c", change_type="add", description="d")
+            ],
+            depends_on=depends_on or [],
+        )
+
+    e1 = make_epic("e1")
+    e2 = make_epic("e2", depends_on=["e1"])
+    e3 = make_epic("e3", depends_on=["e2"])
+
+    roadmap = Roadmap(
+        id="rm-dep-test",
+        title="Dep Test Roadmap",
+        vision_id="v-test",
+        epics=[e3, e2, e1],  # intentionally in wrong order
+    )
+
+    ordered = resolve_epic_order(roadmap.epics)
+    ordered_ids = [e.id for e in ordered]
+
+    assert ordered_ids.index("e1") < ordered_ids.index("e2")
+    assert ordered_ids.index("e2") < ordered_ids.index("e3")
+
+
 def test_status_command_with_locked_artifact(project_dir):
     """Test status command shows locked artifacts."""
     from openplan.storage import PlanRepository

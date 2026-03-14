@@ -128,3 +128,68 @@ Implementing: epic-002-feature-003 — Digest Generation Service
 [08:40:43]   preview: Let me check the available changes in this workspace to determine which one to work on.Based on the conversation context and the available changes, I'll work on the "epic-002-feature-003-digest-genera
 [08:40:46] 
 Implementing: epic-002-feature-004 — Digest Delivery and Notification System
+[09:02:11]   ff done: end_turn
+[09:08:52]   apply done: end_turn
+[09:08:52]   preview: I'll implement tasks from the OpenSpec change. First, I need to determine which change we're working with.Based on the conversation context and available changes, I need to select which change to work
+[09:08:55] 
+Implementing: epic-003-feature-001 — Topic Profile Management
+[09:10:25]   ff done: end_turn
+[09:10:45]   apply done: end_turn
+[09:10:45]   preview: I see multiple changes available. Based on your input "epic-003-feature-001", I'll use that change name.I see that the change "epic-003-feature-001" is in a "spec-driven" schema but is currently block
+[09:10:48] 
+Implementing: epic-003-feature-002 — Paper Fetching and Storage
+[09:12:47]   ff done: end_turn
+[09:13:04]   apply done: end_turn
+[09:13:04]   preview: I need to select which change to implement tasks from. Based on the list, I see several in-progress changes. The user mentioned "epic-003-feature-002" specifically, so I'll use that one.
+
+Let me check
+[09:13:07] 
+Implementing: epic-003-feature-003 — Email Digest Generation
+[09:16:45]   ff done: end_turn
+[09:17:36]   apply done: end_turn
+[09:17:36]   preview: I see there are multiple changes available. Based on your previous input mentioning "epic-003-feature-003", I'll use that change. If you meant a different one, please let me know.
+
+Using change: epic-
+[09:17:39] 
+Implementing: epic-003-feature-004 — Email Delivery Service
+[09:36:22]   ff done: end_turn
+[09:40:12]   apply done: end_turn
+[09:40:12]   preview: I'll implement tasks from an OpenSpec change. First, I need to understand which change you want me to work on.I can see there are multiple changes available. Based on your input, you mentioned "epic-0
+[09:40:15] 
+Implementing: epic-003-feature-005 — Digest Customization
+[09:42:20]   ff done: end_turn
+[09:43:42]   apply done: end_turn
+[09:43:42]   preview: I'll help you implement tasks from an OpenSpec change. First, let me check what changes are available to determine which one to work on.Based on the available changes, I'll work with "epic-003-feature
+[09:43:45] 
+============================================================
+[09:43:45]   PIPELINE COMPLETE
+[09:43:45] ============================================================
+[09:43:45] 
+# OpenPlan Pubwatch Pipeline — Results
+
+**Roadmap:** road-map-001 — PubWatch - Researcher Publication Alert System
+**Epics:** 3
+**Features generated:** 13
+**Features stabilized:** 13
+**Features exported to OpenSpec:** 13
+**Features implemented:** 13
+
+## Epic Breakdown
+- **epic-001** (decomposed): epic-001-feature-001, epic-001-feature-002, epic-001-feature-003, epic-001-feature-004
+- **epic-002** (decomposed): epic-002-feature-001, epic-002-feature-002, epic-002-feature-003, epic-002-feature-004
+- **epic-003** (decomposed): epic-003-feature-001, epic-003-feature-002, epic-003-feature-003, epic-003-feature-004, epic-003-feature-005
+
+## Implementation Results
+- **epic-001-feature-001**: done
+- **epic-001-feature-002**: done
+- **epic-001-feature-003**: done
+- **epic-001-feature-004**: done
+- **epic-002-feature-001**: done
+- **epic-002-feature-002**: done
+- **epic-002-feature-003**: done
+- **epic-002-feature-004**: done
+- **epic-003-feature-001**: done
+- **epic-003-feature-002**: done
+- **epic-003-feature-003**: done
+- **epic-003-feature-004**: done
+- **epic-003-feature-005**: done

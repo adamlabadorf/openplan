@@ -11,6 +11,7 @@ from openplan.core.schemas import (
     Roadmap,
     Vision,
 )
+from openplan.core.ordering import resolve_epic_order
 from openplan.integrations.acp_client import GenerationError, OpenCodeClient
 from openplan.prompts.loader import TemplateLoader
 
@@ -134,6 +135,10 @@ class PlanningEngine:
         Raises:
             PlanningError: If validation fails after max refinements
         """
+        # Note: resolve_epic_order is intended for callers who have the full epic
+        # list (e.g. run_pipeline.py). decompose_epic receives a single Epic, so
+        # ordering cannot be applied here. Callers should call resolve_epic_order
+        # on roadmap.epics before iterating and calling decompose_epic.
         with OpenCodeClient(
             project_dir=str(self.project_dir), model=self.model
         ) as client:
