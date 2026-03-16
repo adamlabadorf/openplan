@@ -9,6 +9,7 @@ from rich.table import Table
 
 from openplan.core.engine import PlanningEngine, PlanningError
 from openplan.core.archive import ArchiveManager, ArchiveError
+from openplan.core.gather import GatherAnalyser
 from openplan.core.schemas import Epic, Feature, Vision
 from openplan.core.stabilizer import FeatureStabilizer
 from openplan.core.campaign_generator import CampaignGenerator
@@ -580,6 +581,49 @@ def archive(
     console.print(f"  Dest:     {openplan_dir / 'archived' / roadmap_id}/")
     if note:
         console.print(f"  Note:     {note}")
+
+
+@app.command()
+def gather(
+    project_dir: Path = typer.Option(Path("."), help="Project root"),
+    design_dir: Optional[Path] = typer.Option(None, help="Design docs dir (default: <project-dir>/design)"),
+    src_dir: Optional[Path] = typer.Option(None, help="Source dir (default: <project-dir>/src)"),
+    tests_dir: Optional[Path] = typer.Option(None, help="Tests dir (default: <project-dir>/tests)"),
+    model: Optional[str] = typer.Option(None, help="Model for AI generation"),
+    output_vision: Optional[str] = typer.Option(None, help="Vision ID to create"),
+    decompose: bool = typer.Option(False, help="Also generate epics and features"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Write GATHER.md only, no vision/roadmap"),
+) -> None:
+    """Gather project context and write GATHER.md (optionally generate new vision/roadmap)."""
+    project_dir = project_dir.resolve()
+
+    # Resolve default dirs relative to project_dir
+    resolved_src = src_dir if src_dir is not None else project_dir / "src"
+    resolved_tests = tests_dir if tests_dir is not None else project_dir / "tests"
+    resolved_design = design_dir if design_dir is not None else project_dir / "design"
+
+    analyser = GatherAnalyser(project_dir, model=model)
+    context = analyser.analyse()
+
+    analyser.write_gather_doc(context, gaps=[])
+
+    gather_path = project_dir / "openplan" / "GATHER.md"
+    console.print(f"[green]✓ GATHER.md written:[/green] {gather_path}")
+    console.print(f"  Modules found:     {len(context.existing_modules)}")
+    console.print(f"  Deferred items:    {len(context.deferred_items)}")
+    console.print(f"  Post-plan changes: {len(context.post_plan_changes)}")
+    console.print(f"  Tests collected:   {context.test_count}")
+    console.print(f"  Design docs:       {len(context.design_docs)}")
+    console.print(f"  Prior roadmaps:    {len(context.prior_roadmap_ids)}")
+
+    if not dry_run:
+        try:
+            analyser.generate(context)
+        except NotImplementedError as e:
+            console.print(f"\n[yellow]Note:[/yellow] {e}")
+            console.print(
+                "[yellow]Re-run with --model <model> to generate a new vision and roadmap.[/yellow]"
+            )
 
 
 if __name__ == "__main__":
