@@ -31,3 +31,11 @@
 - `openplan/core/archive.py` — `ArchiveManager` class with `archive()`, `list_archived()`, history writing
 - `get_history()` and `list_archived_roadmaps()` helpers in `engine.py`
 - 15 new tests (118 total)
+
+## 1.3.0 (2026-03-16)
+
+### Added
+- `openplan gather` CLI command — analyses current codebase + history and synthesises a new vision/roadmap for the next planning cycle
+- `openplan/core/gather.py` — `GatherAnalyser` class with `GatherContext` dataclass; analyses src modules, HISTORY.md, openspec changes, design docs, and test shape
+- `--dry-run` writes `GATHER.md` analysis only; `--decompose` triggers full epic/feature generation
+- 9 new tests (127 total)
