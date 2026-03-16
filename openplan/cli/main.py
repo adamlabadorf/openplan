@@ -8,6 +8,7 @@ from rich.console import Console
 from rich.table import Table
 
 from openplan.core.engine import PlanningEngine, PlanningError
+from openplan.core.archive import ArchiveManager, ArchiveError
 from openplan.core.schemas import Epic, Feature, Vision
 from openplan.core.stabilizer import FeatureStabilizer
 from openplan.core.campaign_generator import CampaignGenerator
@@ -506,6 +507,79 @@ def implement(
     except PipelineError as e:
         rich_console.print(f"[bold red]✗ Pipeline failed:[/bold red] {e}")
         raise typer.Exit(1)
+
+
+@app.command()
+def archive(
+    roadmap_id: Optional[str] = typer.Option(None, "--roadmap-id", help="Roadmap to archive"),
+    note: str = typer.Option("", "--note", help="Summary note for HISTORY.md"),
+    project_dir: Path = typer.Option(Path("."), "--project-dir", help="Project root"),
+    force: bool = typer.Option(False, "--force", help="Archive even without implementation_report.md"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Print plan without executing"),
+) -> None:
+    """Archive a completed roadmap and all its artifacts."""
+    openplan_dir = project_dir / "openplan"
+
+    # Auto-detect roadmap if not specified
+    if roadmap_id is None:
+        roadmap_files = list((openplan_dir / "roadmaps").glob("*.yaml")) if (openplan_dir / "roadmaps").exists() else []
+        if len(roadmap_files) == 0:
+            console.print("[red]Error: No roadmaps found in openplan/roadmaps/[/red]")
+            raise typer.Exit(code=1)
+        if len(roadmap_files) > 1:
+            ids = [f.stem for f in roadmap_files]
+            console.print(f"[red]Error: Multiple roadmaps found: {ids}. Specify --roadmap-id.[/red]")
+            raise typer.Exit(code=1)
+        roadmap_id = roadmap_files[0].stem
+
+    # Check for implementation_report.md
+    impl_report = openplan_dir / "implementation_report.md"
+    if not impl_report.exists() and not force:
+        console.print(
+            "[yellow]Warning: openplan/implementation_report.md not found.[/yellow]\n"
+            "[yellow]Use --force to archive anyway.[/yellow]"
+        )
+        raise typer.Exit(code=1)
+
+    # Collect what would be moved
+    roadmap_path = openplan_dir / "roadmaps" / f"{roadmap_id}.yaml"
+    if not roadmap_path.exists():
+        console.print(f"[red]Error: Roadmap file not found: {roadmap_path}[/red]")
+        raise typer.Exit(code=1)
+
+    import yaml
+    with open(roadmap_path) as f:
+        roadmap_data = yaml.safe_load(f) or {}
+
+    epics = list((openplan_dir / "epics").glob("epic-*.yaml")) if (openplan_dir / "epics").exists() else []
+    features = list((openplan_dir / "features").glob("epic-*-feature-*.yaml")) if (openplan_dir / "features").exists() else []
+
+    if dry_run:
+        console.print(f"[bold]Dry run — would archive roadmap:[/bold] {roadmap_id}")
+        console.print(f"  Roadmap:  {roadmap_path}")
+        console.print(f"  Epics:    {len(epics)}")
+        console.print(f"  Features: {len(features)}")
+        if impl_report.exists():
+            console.print(f"  Report:   {impl_report}")
+        if note:
+            console.print(f"  Note:     {note}")
+        console.print(f"  Dest:     {openplan_dir / 'archived' / roadmap_id}/")
+        raise typer.Exit(0)
+
+    try:
+        manager = ArchiveManager(project_dir)
+        manager.archive(roadmap_id, note=note)
+    except ArchiveError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise typer.Exit(code=1)
+
+    console.print(f"[green]✓ Archived roadmap:[/green] {roadmap_id}")
+    console.print(f"  Title:    {roadmap_data.get('title', roadmap_id)}")
+    console.print(f"  Epics:    {len(epics)}")
+    console.print(f"  Features: {len(features)}")
+    console.print(f"  Dest:     {openplan_dir / 'archived' / roadmap_id}/")
+    if note:
+        console.print(f"  Note:     {note}")
 
 
 if __name__ == "__main__":

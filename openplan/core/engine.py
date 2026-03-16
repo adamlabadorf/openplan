@@ -1,4 +1,5 @@
 import json
+import re
 
 import yaml
 from contextlib import contextmanager
@@ -342,3 +343,58 @@ class PlanningEngine:
         filepath = features_dir / f"{feature.id}.yaml"
         with open(filepath, "w") as f:
             yaml.dump(feature.model_dump(by_alias=True), f, default_flow_style=False)
+
+
+# ---------------------------------------------------------------------------
+# Module-level helpers (no engine instance required)
+# ---------------------------------------------------------------------------
+
+def get_history(project_dir: Path) -> list[dict]:
+    """Parse openplan/HISTORY.md and return a list of archive entry dicts.
+
+    Each dict has keys: ``roadmap_id``, ``title``, ``date``, ``note``.
+    """
+    history_path = Path(project_dir) / "openplan" / "HISTORY.md"
+    if not history_path.exists():
+        return []
+
+    content = history_path.read_text()
+    entries: list[dict] = []
+
+    # Match headings of the form:
+    # ## road-map-001 — Some Title (archived 2025-01-01)
+    heading_re = re.compile(
+        r"^## ([^\s—]+) — (.+?) \(archived (\d{4}-\d{2}-\d{2})\)",
+        re.MULTILINE,
+    )
+    note_re = re.compile(r"\*\*Note:\*\* (.+)", re.MULTILINE)
+
+    # Split on heading boundaries to capture notes per-entry
+    sections = re.split(r"(?=^## )", content, flags=re.MULTILINE)
+    for section in sections:
+        m = heading_re.match(section.strip())
+        if not m:
+            continue
+        roadmap_id = m.group(1)
+        title = m.group(2).strip()
+        archived_date = m.group(3)
+        note_m = note_re.search(section)
+        note = note_m.group(1).strip() if note_m else ""
+        entries.append(
+            {
+                "roadmap_id": roadmap_id,
+                "title": title,
+                "date": archived_date,
+                "note": note,
+            }
+        )
+
+    return entries
+
+
+def list_archived_roadmaps(project_dir: Path) -> list[str]:
+    """Return sorted list of archived roadmap IDs."""
+    from openplan.core.archive import ArchiveManager
+
+    manager = ArchiveManager(Path(project_dir))
+    return manager.list_archived()
