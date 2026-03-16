@@ -23,3 +23,11 @@
 
 ### Changed
 - `examples/pubwatch/run_pipeline.py` refactored to thin wrapper over `ImplementationPipeline`
+
+## 1.2.0 (2026-03-16)
+
+### Added
+- `openplan archive` CLI command — marks a completed roadmap as done, moves all artifacts to `openplan/archived/<roadmap-id>/`, writes/appends `openplan/HISTORY.md`
+- `openplan/core/archive.py` — `ArchiveManager` class with `archive()`, `list_archived()`, history writing
+- `get_history()` and `list_archived_roadmaps()` helpers in `engine.py`
+- 15 new tests (118 total)
